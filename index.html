@@ -404,7 +404,7 @@ function syncIconReflections(){
 }
 
 // ---- ambient dust: slow drifting motes for atmosphere (always on) ----
-const DUST=220;
+const DUST=130;  // subtle ambient pink dust drifting over the hero photo (was 220 over the generative bg)
 const dGeo=new THREE.BufferGeometry();
 const dPos=new Float32Array(DUST*3);
 const dState=[];
@@ -418,8 +418,8 @@ const softSprite=(()=>{const s=32,cv=document.createElement('canvas');cv.width=c
   const g=x.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
   g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(1,'rgba(255,255,255,0)');
   x.fillStyle=g;x.fillRect(0,0,s,s);return new THREE.CanvasTexture(cv);})();
-const dust=new THREE.Points(dGeo,new THREE.PointsMaterial({size:0.028,map:softSprite,color:0xE5489F,
-  transparent:true,opacity:0.30,depthWrite:false}));
+const dust=new THREE.Points(dGeo,new THREE.PointsMaterial({size:0.03,map:softSprite,color:0xE5489F,
+  transparent:true,opacity:0.22,depthWrite:false,blending:THREE.NormalBlending}));
 root.add(dust);
 function updateDust(t){
   const p=dGeo.attributes.position.array;

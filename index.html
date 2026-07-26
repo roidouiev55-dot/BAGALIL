@@ -419,6 +419,49 @@ const motes=new THREE.Points(moteGeo,new THREE.PointsMaterial({
 }));
 foreGroup.add(motes);
 
+// ------- DEPTH DUST — 3 extra particle strata for parallax density -------
+// dustGroup sits at its own parallax (0.7x). Two more strata ride foreGroup (1.40x) at
+// different Z so perspective gives real depth separation. Gold light-dust is Additive
+// (backlit glints on the mid-gold sky); pink pollen is NormalBlending + saturated (rule 7).
+const dustGroup=new THREE.Group(); spaceRoot.add(dustGroup);
+const dustLayers=[];
+(function buildDepthDust(){
+  const spr=(rgb)=>{const s=32,cv=document.createElement('canvas');cv.width=cv.height=s;
+    const c=cv.getContext('2d');const g=c.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+    g.addColorStop(0,'rgba('+rgb+',1)');g.addColorStop(1,'rgba('+rgb+',0)');
+    c.fillStyle=g;c.fillRect(0,0,s,s);return new THREE.CanvasTexture(cv);};
+  const goldSpr=spr('255,228,176'), pinkSpr=spr('247,168,206');
+
+  function addLayer(group,cfg){
+    const geo=new THREE.BufferGeometry(), pos=new Float32Array(cfg.count*3), st=[];
+    for(let i=0;i<cfg.count;i++){
+      const r=cfg.rMin+Math.random()*(cfg.rMax-cfg.rMin), a=Math.random()*Math.PI*2;
+      const y=cfg.yLo+Math.random()*(cfg.yHi-cfg.yLo), z=cfg.zLo+Math.random()*(cfg.zHi-cfg.zLo);
+      st.push({r,a,y,z, sp:cfg.swirl*(0.4+Math.random()), ph:Math.random()*6, bob:cfg.bob});
+      pos[i*3]=Math.cos(a)*r; pos[i*3+1]=y; pos[i*3+2]=Math.sin(a)*r*0.3+z;
+    }
+    geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    const pts=new THREE.Points(geo,new THREE.PointsMaterial({
+      size:cfg.size, map:cfg.sprite, color:cfg.color, transparent:true, opacity:cfg.opacity,
+      depthWrite:false, blending:cfg.blend, fog:false, sizeAttenuation:true
+    }));
+    group.add(pts);
+    dustLayers.push({geo, st, count:cfg.count});
+  }
+
+  // 1) deep light-dust — slow, dim, far behind (its own 0.7x parallax group)
+  addLayer(dustGroup,{count:90, rMin:6,rMax:16, yLo:-6,yHi:8, zLo:-30,zHi:-12,
+    size:0.05, color:0xF3D9B0, opacity:0.32, blend:THREE.AdditiveBlending, swirl:0.05, bob:0.35});
+  // 2) mid pink pollen — brand accent, saturated so it never washes out (rule 7)
+  addLayer(foreGroup,{count:44, rMin:3,rMax:10, yLo:-4,yHi:5, zLo:-16,zHi:-6,
+    size:0.09, color:0xF7A8CE, opacity:0.5, blend:THREE.NormalBlending, swirl:0.08, bob:0.5});
+  // 3) near bokeh sparkle — bright, close, additive glints
+  addLayer(foreGroup,{count:50, rMin:2,rMax:8, yLo:-3,yHi:4, zLo:0,zHi:6,
+    size:0.06, color:0xFFF0CE, opacity:0.7, blend:THREE.AdditiveBlending, swirl:0.10, bob:0.6});
+
+  console.log('[BAGLIL] depth dust ready ('+dustLayers.length+' strata)');
+})();
+
 // ---------- lights ----------
 scene.add(new THREE.AmbientLight(0xffffff,0.55));
 const key=new THREE.DirectionalLight(0xffffff,1.6); key.position.set(2,3.5,3); scene.add(key);
@@ -932,6 +975,20 @@ function frame(){
       pa[i*3+2] = Math.sin(s.a)*s.r - 2;
     }
     moteGeo.attributes.position.needsUpdate=true;
+  }
+
+  // depth-dust strata: swirl + vertical bob (dustGroup carries its own 0.7x parallax)
+  dustGroup.rotation.y = yaw*0.70;  dustGroup.rotation.x = pit*0.8;
+  for(let L=0;L<dustLayers.length;L++){
+    const lay=dustLayers[L], pa=lay.geo.attributes.position.array, st=lay.st;
+    for(let i=0;i<lay.count;i++){
+      const s=st[i];
+      s.a += s.sp*0.01;
+      pa[i*3]   = Math.cos(s.a)*s.r;
+      pa[i*3+1] = s.y + Math.sin(tSec*0.4 + s.ph)*s.bob;
+      pa[i*3+2] = Math.sin(s.a)*s.r*0.3 + s.z;
+    }
+    lay.geo.attributes.position.needsUpdate=true;
   }
 
   // (3) light sweep across the logo right after it solidifies

@@ -852,8 +852,10 @@ const FilmGradeShader = {
     comp.setPixelRatio(FX_MOBILE?Math.min(devicePixelRatio,1.5):Math.min(devicePixelRatio,2)); // bloom cost scales with pixels; favor FPS on mobile
     comp.setSize(innerWidth,innerHeight);
     comp.addPass(new RenderPass(scene,camera));
-    // bloom: gentle on mobile so it never tanks FPS; high threshold so only bright glints bloom
-    const strength=FX_MOBILE?0.5:0.72, radius=0.6, threshold=0.72;
+    // bloom runs in linear HDR before tone mapping. The golden-hour sky sits ~0.62-0.70 luminance,
+    // so threshold is kept ABOVE it (0.82) — only the additive glints, sun glow and specular
+    // highlights bloom, the sky itself does not wash out. Conservative strength; easy to push later.
+    const strength=FX_MOBILE?0.42:0.6, radius=0.55, threshold=0.82;
     comp.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),strength,radius,threshold));
     comp.addPass(new OutputPass());           // tone map + sRGB, BEFORE the film grade
     const grade=new ShaderPass(FilmGradeShader);

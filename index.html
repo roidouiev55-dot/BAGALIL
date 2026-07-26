@@ -69,21 +69,26 @@
      background:radial-gradient(120% 100% at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,.28) 100%)}
   #flash{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(60% 55% at 50% 45%, rgba(255,255,255,.95), rgba(255,214,238,.55) 45%, rgba(255,214,238,0) 75%);
      transition:opacity .12s ease-out}
+  /* headline sits BELOW the top logo on the first screen; TUNE this padding to align with the
+     3D logo (which is placed by LOGO_Y/LOGO_W in the JS). On the CTA screen (.low) it lifts. */
   #ui{position:fixed;left:0;right:0;top:0;display:flex;flex-direction:column;align-items:center;
-     padding:calc(6vh + env(safe-area-inset-top)) 20px 0;pointer-events:none;text-align:center;
+     padding:calc(34vh + env(safe-area-inset-top)) 20px 0;pointer-events:none;text-align:center;
      transition:padding-top .9s cubic-bezier(.2,.8,.3,1)}
-  #ui.low{padding-top:calc(15vh + env(safe-area-inset-top))}
-  #tag{font-family:'Frank Ruhl Libre',serif;font-weight:900;color:var(--pink);
-     font-size:clamp(36px,9.5vw,88px);line-height:1.06;letter-spacing:-1px;
-     opacity:0;transform:translateY(-14px) scale(.985);filter:blur(10px);
-     transition:opacity 1.2s cubic-bezier(.2,.8,.25,1),transform 1.2s cubic-bezier(.2,.8,.25,1),filter 1.2s ease;
-     text-shadow:0 0 2px rgba(255,252,246,1), 0 2px 14px rgba(255,252,246,.98), 0 6px 40px rgba(255,252,246,.9), 0 2px 3px rgba(150,40,90,.14)}
-  #sub{font-family:'Heebo',sans-serif;font-weight:500;color:rgba(229,72,159,.78);
-     font-size:clamp(13px,3.6vw,19px);letter-spacing:5px;margin-top:18px;
-     opacity:0;transform:translateY(-6px);filter:blur(6px);
-     transition:opacity 1s ease .4s,transform 1s ease .4s,filter 1s ease .4s}
-  #sub.show{opacity:1;transform:none;filter:none}
-  #tag.show{opacity:1;transform:none;filter:none}
+  #ui.low{padding-top:calc(16vh + env(safe-area-inset-top))}
+  /* photo-hero layout: small headline under the top logo, strong dark shadow for readability
+     over the photo (bright + dark regions). Brand pink kept — it pops on this image. */
+  #tag{font-family:'Frank Ruhl Libre',serif;font-weight:700;color:var(--pink);
+     font-size:clamp(20px,4.5vw,32px);line-height:1.18;letter-spacing:-0.2px;
+     opacity:0;transform:translateY(-8px);
+     transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.25,1);
+     text-shadow:0 1px 2px rgba(0,0,0,.6), 0 2px 12px rgba(0,0,0,.5), 0 4px 28px rgba(0,0,0,.42)}
+  #sub{font-family:'Heebo',sans-serif;font-weight:500;color:rgba(229,72,159,.92);
+     font-size:clamp(12px,3.2vw,16px);letter-spacing:4px;margin-top:10px;
+     opacity:0;transform:translateY(-5px);
+     transition:opacity .9s ease .3s,transform .9s ease .3s;
+     text-shadow:0 1px 3px rgba(0,0,0,.65), 0 2px 14px rgba(0,0,0,.5)}
+  #sub.show{opacity:1;transform:none}
+  #tag.show{opacity:1;transform:none}
   .badge{position:fixed;left:0;top:0;transform:translate(-50%,-50%) scale(.9);opacity:0;
      pointer-events:none;display:inline-flex;align-items:baseline;gap:6px;text-decoration:none;cursor:pointer;
      background:rgba(255,255,255,.92);border:1.5px solid rgba(229,72,159,.35);
@@ -239,12 +244,17 @@ for(const s of CONTOURS){ const g=new THREE.ExtrudeGeometry(makeShape(s),extrude
 const box=new THREE.Box3().setFromObject(group); const ctr=new THREE.Vector3(); box.getCenter(ctr);
 const size=new THREE.Vector3(); box.getSize(size);
 group.position.sub(ctr);
-const wrap=new THREE.Group(); wrap.add(group); wrap.position.y=0.15;
-const LS=2.6/Math.max(size.x,size.y); wrap.scale.setScalar(LS);
+// LAYOUT (photo hero): logo sits small at TOP CENTER so the cheers photo stays visible.
+// Both values are read by logoMatrix below, so the particle morph target moves with the solid
+// logo (stays in sync). Icons are a separate group and are unaffected. TUNE HERE if needed:
+const LOGO_W=1.30;                 // logo world width (was 2.6) -> ~15-18% frame height on mobile
+const LOGO_Y=1.15;                 // vertical lift toward the top (was 0.15, near centre)
+const wrap=new THREE.Group(); wrap.add(group); wrap.position.y=LOGO_Y;
+const LS=LOGO_W/Math.max(size.x,size.y); wrap.scale.setScalar(LS);
 root.add(wrap);
 
 // ---------- soft mirrored reflection ----------
-const reflMat=pink.clone(); reflMat.transparent=true; reflMat.opacity=0.16; reflMat.depthWrite=false;
+const reflMat=pink.clone(); reflMat.transparent=true; reflMat.opacity=0.07; reflMat.depthWrite=false; // fainter over the photo
 const reflGroup=group.clone(true); reflGroup.traverse(o=>{ if(o.isMesh) o.material=reflMat; });
 const reflWrap=new THREE.Group(); reflWrap.add(reflGroup);
 reflWrap.scale.copy(wrap.scale); reflWrap.scale.y*=-1;

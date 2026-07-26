@@ -235,59 +235,9 @@ const skyGroup=new THREE.Group(); spaceRoot.add(skyGroup);
   skyGroup.add(sphere);
 })();
 
-// ------- FAR LAYER — Galilee drone video as a 3D depth plane -------
-// video is served as an external file (galilee.mp4) alongside index.html;
-// NOT base64-embedded (would balloon the page to ~11MB — mobile red flag).
-// Uses VideoTexture on a Plane so it composites correctly with our foreground 3D layers,
-// not a DOM <video> element (that would break z-ordering with WebGL).
-const farGroup=new THREE.Group(); spaceRoot.add(farGroup);
-(function buildVideoBackdrop(){
-  const vid=document.createElement('video');
-  vid.src='galilee.mp4';
-  vid.loop=true;
-  vid.muted=true;                    // iOS requires muted for autoplay
-  vid.playsInline=true;              // without this iOS opens fullscreen
-  vid.autoplay=true;
-  vid.crossOrigin='anonymous';
-  vid.setAttribute('webkit-playsinline','');
-  vid.play().catch(err=>console.warn('[BAGLIL] video autoplay blocked:',err));
-  // if the file is missing or the codec is unsupported, hide the plane so the sky shows through
-  vid.addEventListener('error',()=>{
-    console.warn('[BAGLIL] video failed to load — falling back to sky');
-    if(farGroup.userData.plane) farGroup.userData.plane.visible=false;
-  });
-
-  const tex=new THREE.VideoTexture(vid);
-  tex.colorSpace=THREE.SRGBColorSpace;
-  tex.minFilter=THREE.LinearFilter;
-  tex.magFilter=THREE.LinearFilter;
-  tex.generateMipmaps=false;
-
-  // wide 16:9 plane in front of the sky, behind foreground droplets/shafts/motes.
-  // sized generously so it fills the field of view on any mobile viewport.
-  const W=180, H=W*(9/16);
-  const plane=new THREE.Mesh(
-    new THREE.PlaneGeometry(W,H,1,1),
-    new THREE.MeshBasicMaterial({
-      map:tex,
-      // brightness/saturation reduction happens through vertex colors + a scrim overlay
-      // (WebGL MeshBasic has no built-in filters — the scrim layer handles the wash)
-      fog:false,
-      depthWrite:false,
-      toneMapped:false
-    })
-  );
-  plane.position.set(0, 4, -55);
-  plane.renderOrder=-3;
-  farGroup.add(plane);
-
-  // subtle Z drift with scroll — the video already moves forward, so we push the plane
-  // gently in and out along Z to reinforce "we're moving too" without fighting its motion
-  farGroup.userData.plane=plane;
-  console.log('[BAGLIL] video backdrop plane installed');
-})();
-
-
+// ------- FAR LAYER — removed (was: Galilee drone video plane, galilee.mp4 ~7.9MB) -------
+// Replaced by the generative brand world (atmospheric fog, god rays, dynamic sky, dust).
+// The .mp4 file is retained on disk but no longer referenced by the page.
 
 // ------- FOREGROUND SPACE (12 units and closer) — brand-abstract elements floating IN 3D -------
 const foreGroup=new THREE.Group(); spaceRoot.add(foreGroup);
@@ -806,11 +756,6 @@ function frame(){
   const yaw = -P*Math.PI*0.55 - px*0.25;
   const pit = 0.02 + py*0.05;
   skyGroup.rotation.y  = yaw*0.15;  skyGroup.rotation.x  = pit*0.4;    // near-still
-  // video plane doesn't rotate horizontally — its own drone footage handles the motion.
-  // instead, drift it forward/back on Z with scroll to reinforce "we're flying too"
-  if(farGroup.userData.plane){
-    farGroup.userData.plane.position.z = -55 + P*8;                    // moves a touch closer as you scroll
-  }
   foreGroup.rotation.y = yaw*1.40;  foreGroup.rotation.x = pit*1.1;    // fastest, closest
 
   // droplets drift on their own — small breathing so they feel alive in the volume

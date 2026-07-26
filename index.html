@@ -67,6 +67,11 @@
      background:linear-gradient(0deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,.28) 60%, rgba(0,0,0,0) 100%)}
   #vig{position:fixed;inset:0;pointer-events:none;z-index:-1;
      background:radial-gradient(120% 100% at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,.28) 100%)}
+  /* film grain over the photo (the WebGL grade pass can't touch the DOM image) — subtle, static */
+  #grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+     background-size:160px 160px}
+  @media (prefers-reduced-motion: reduce){ #grain{opacity:.04} }
   #flash{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(60% 55% at 50% 45%, rgba(255,255,255,.95), rgba(255,214,238,.55) 45%, rgba(255,214,238,0) 75%);
      transition:opacity .12s ease-out}
   /* headline sits BELOW the top logo on the first screen; TUNE this padding to align with the
@@ -136,6 +141,7 @@
 <div id="washTop"></div>
 <div id="washBot"></div>
 <div id="vig"></div>
+<div id="grain"></div>
 <div id="cue"><span>גללו</span><span class="arrow"></span></div>
 <div id="flash"></div>
 <div id="ui">
@@ -562,7 +568,11 @@ addEventListener('resize',resize); resize();
 // Loaded via dynamic import inside try/catch: if any addon fails, composer stays null and the
 // loop falls back to plain renderer.render — the page never blanks (protects the load KPI).
 // Kill-switch: append ?nofx to the URL to disable all post-fx for debugging.
-const FX_ON = !/[?&]nofx\b/.test(location.search);
+// Post-fx is OPT-IN now (?fx). The EffectComposer chain (UnrealBloomPass + the alpha=1 grade
+// pass) renders the canvas OPAQUE, which would hide the hero photo behind the transparent canvas.
+// The cinematic look (film grain + vignette) is delivered as DOM overlays over the photo instead.
+// Keep the code for a future alpha-preserving selective-bloom pass on the pink elements only.
+const FX_ON = /[?&]fx\b/.test(location.search);
 const FX_MOBILE = Math.min(innerWidth,innerHeight) < 700 || /Mobi|Android/i.test(navigator.userAgent);
 const FilmGradeShader = {
   uniforms:{
@@ -597,7 +607,7 @@ const FilmGradeShader = {
   ].join('\n')
 };
 (async()=>{
-  if(!FX_ON){ console.log('[BAGLIL] post-fx disabled via ?nofx'); return; }
+  if(!FX_ON){ console.log('[BAGLIL] WebGL post-fx off (opt-in via ?fx); DOM grain+vignette handle the film look'); return; }
   try{
     const [{EffectComposer},{RenderPass},{UnrealBloomPass},{ShaderPass},{OutputPass}] = await Promise.all([
       import('three/addons/postprocessing/EffectComposer.js'),

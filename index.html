@@ -233,6 +233,43 @@ const skyGroup=new THREE.Group(); spaceRoot.add(skyGroup);
   skyGroup.add(sphere);
 })();
 
+// ------- SKY LIFE — breathing sun-glow + drifting cirrus, so the sky reads as alive -------
+// Added to skyGroup so it inherits the sky's slow scroll rotation. A big additive sun disc
+// pulses at the gradient's sun position (upper-right); soft cirrus wisps drift on NormalBlending
+// (rule 7: they occlude/read as light cloud on the bright gold, not additive wash).
+(function buildSkyLife(){
+  const disc=(inner,outer)=>{const s=256,cv=document.createElement('canvas');cv.width=cv.height=s;
+    const c=cv.getContext('2d');const g=c.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+    g.addColorStop(0,inner);g.addColorStop(0.5,outer);g.addColorStop(1,'rgba(255,255,255,0)');
+    c.fillStyle=g;c.fillRect(0,0,s,s);const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;return t;};
+
+  // breathing sun glow — additive, sits at the sky's sun direction (upper-right, far)
+  const sun=new THREE.Mesh(new THREE.PlaneGeometry(90,90),
+    new THREE.MeshBasicMaterial({map:disc('rgba(255,247,224,0.9)','rgba(255,226,170,0.35)'),
+      transparent:true, opacity:0.55, blending:THREE.AdditiveBlending,
+      depthWrite:false, fog:false, toneMapped:false}));
+  sun.position.set(70,34,-180); sun.renderOrder=-4;
+  skyGroup.add(sun);
+
+  // drifting cirrus wisps — soft warm-white, normal blending, high in the sky
+  const wispTex=disc('rgba(255,252,246,0.85)','rgba(255,244,228,0.3)');
+  const wisps=[];
+  for(let i=0;i<3;i++){
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),
+      new THREE.MeshBasicMaterial({map:wispTex, color:0xFFF3DE, transparent:true,
+        opacity:0.10+i*0.02, depthWrite:false, fog:false, toneMapped:true,
+        blending:THREE.NormalBlending, side:THREE.DoubleSide}));
+    m.scale.set(120+i*26, 30+i*6, 1);
+    m.position.set(-90+i*70, 26+i*12, -178+i*2);
+    m.renderOrder=-4;
+    m.userData={base:m.position.clone(), sp:0.5+i*0.35, seed:i*2.1, drift:26+i*10};
+    skyGroup.add(m); wisps.push(m);
+  }
+  skyGroup.userData.sun=sun;
+  skyGroup.userData.wisps=wisps;
+  console.log('[BAGLIL] sky life ready (sun glow + '+wisps.length+' cirrus)');
+})();
+
 // ------- FAR LAYER — removed (was: Galilee drone video plane, galilee.mp4 ~7.9MB) -------
 // Replaced by the generative brand world (atmospheric fog, god rays, dynamic sky, dust).
 // The .mp4 file is retained on disk but no longer referenced by the page.
@@ -841,7 +878,18 @@ function frame(){
   // ---- REAL 3D SPACE: each layer moves at its own speed, that's what sells depth ----
   const yaw = -P*Math.PI*0.55 - px*0.25;
   const pit = 0.02 + py*0.05;
-  skyGroup.rotation.y  = yaw*0.15;  skyGroup.rotation.x  = pit*0.4;    // near-still
+  skyGroup.rotation.y  = yaw*0.15 + time*0.004;  skyGroup.rotation.x = pit*0.4;  // near-still + slow drift
+  // sky life: sun glow breathes, cirrus wisps drift laterally
+  if(skyGroup.userData.sun){
+    const sg=skyGroup.userData.sun;
+    const b=1 + Math.sin(time*0.5)*0.05;
+    sg.scale.setScalar(b);
+    sg.material.opacity = 0.5 + Math.sin(time*0.35)*0.08;
+    const ws=skyGroup.userData.wisps;
+    for(let i=0;i<ws.length;i++){ const w=ws[i], u=w.userData;
+      w.position.x = u.base.x + Math.sin(time*0.02*u.sp + u.seed)*u.drift;
+    }
+  }
   foreGroup.rotation.y = yaw*1.40;  foreGroup.rotation.x = pit*1.1;    // fastest, closest
 
   // droplets drift on their own — small breathing so they feel alive in the volume

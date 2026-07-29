@@ -1,844 +1,667 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>BAGALIL · האירועים הכי שווים בגליל</title>
-<meta name="description" content="פסטיבלי יין ואירועים בגליל. הצטרפו לקהילה ואל תפספסו את האירוע הבא.">
-<meta name="theme-color" content="#FBF7F0">
-<meta property="og:type" content="website">
-<meta property="og:title" content="BAGALIL · האירועים הכי שווים בגליל">
-<meta property="og:description" content="יין | מוזיקה | חופש — אל תפספסו את האירוע הבא.">
-<meta property="og:locale" content="he_IL">
-<meta property="og:image" content="og-cover.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root{--pink:#E5489F;--cream:#F4ECDF}
-  *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:auto}
-  body{margin:0;background:#FBF7F0;overscroll-behavior-y:none}
-  #spacer{width:1px;pointer-events:none}
-  #cue{position:fixed;left:0;right:0;bottom:calc(3vh + env(safe-area-inset-bottom));
-     display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;
-     font-family:'Heebo',sans-serif;font-size:12px;letter-spacing:3px;color:rgba(229,72,159,.7);
-     transition:opacity .6s ease}
-  #cue.hide{opacity:0}
-  #cue .arrow{width:20px;height:20px;border-right:2px solid rgba(229,72,159,.65);
-     border-bottom:2px solid rgba(229,72,159,.65);transform:rotate(45deg);
-     animation:cueBob 1.6s ease-in-out infinite}
-  @keyframes cueBob{0%,100%{transform:rotate(45deg) translate(0,0);opacity:.5}
-     50%{transform:rotate(45deg) translate(4px,4px);opacity:1}}
-  #scene{position:fixed;inset:0;z-index:-2;overflow:hidden;background:#241318}
-  #scene img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block}
-  #c{position:fixed;inset:0;display:block;touch-action:none}
-  #boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;gap:9px;
-     background:#FBF7F0;z-index:50;transition:opacity .5s ease}
-  #boot.gone{opacity:0;pointer-events:none}
-  .bootDot{width:9px;height:9px;border-radius:50%;background:var(--pink);opacity:.35;
-     animation:bd 1.1s ease-in-out infinite}
-  .bootDot:nth-child(2){animation-delay:.15s}
-  .bootDot:nth-child(3){animation-delay:.3s}
-  @keyframes bd{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-6px)}}
-  #nogl{display:none;position:fixed;inset:0;z-index:60;flex-direction:column;align-items:center;
-     justify-content:center;gap:14px;padding:28px;text-align:center;background:#FBF7F0}
-  #nogl.on{display:flex}
-  #nogl h1{font-family:'Frank Ruhl Libre',serif;font-weight:900;color:var(--pink);font-size:clamp(30px,8.5vw,56px);line-height:1.08;letter-spacing:-0.5px}
-  #nogl p{font-family:'Heebo',sans-serif;color:rgba(229,72,159,.75);letter-spacing:3px;font-size:15px}
-  .nglBtns{display:flex;flex-direction:column;gap:10px;margin-top:12px;width:min(320px,86vw)}
-  .nglBtn{font-family:'Heebo',sans-serif;font-weight:700;text-decoration:none;text-align:center;
-     background:var(--pink);color:#fff;padding:15px 22px;border-radius:999px;
-     box-shadow:0 10px 28px rgba(229,72,159,.3)}
-  .nglBtn.alt{background:rgba(255,255,255,.9);color:var(--pink);border:1.6px solid var(--pink);box-shadow:none}
-  @media (prefers-reduced-motion: reduce){
-    .ripple i{animation:none;opacity:.45;transform:scale(1)}
-    .bootDot{animation:none}
-    #tag,#sub{transition:opacity .4s ease;filter:none;transform:none}
-  }
-  /* dark scrims for text readability over the photo — sit ABOVE the image (z-2) but BELOW the
-     canvas/text (z-1), so the morph, logo, icons and headline all stay crisp on top. Center is
-     left clear so the cheers stays visible. */
-  #washTop{position:fixed;top:0;left:0;right:0;height:28vh;pointer-events:none;z-index:-1;
-     background:linear-gradient(180deg, rgba(0,0,0,.42) 0%, rgba(0,0,0,.22) 55%, rgba(0,0,0,0) 100%)}
-  #washBot{position:fixed;bottom:0;left:0;right:0;height:30vh;pointer-events:none;z-index:-1;
-     background:linear-gradient(0deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,.28) 60%, rgba(0,0,0,0) 100%)}
-  #vig{position:fixed;inset:0;pointer-events:none;z-index:-1;
-     background:radial-gradient(120% 100% at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,.28) 100%)}
-  /* film grain over the photo (the WebGL grade pass can't touch the DOM image) — subtle, static */
-  #grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
-     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-     background-size:160px 160px}
-  @media (prefers-reduced-motion: reduce){ #grain{opacity:.04} }
-  #flash{position:fixed;inset:0;pointer-events:none;opacity:0;background:radial-gradient(60% 55% at 50% 45%, rgba(255,255,255,.95), rgba(255,214,238,.55) 45%, rgba(255,214,238,0) 75%);
-     transition:opacity .12s ease-out}
-  /* headline sits BELOW the top logo on the first screen; TUNE this padding to align with the
-     3D logo (which is placed by LOGO_Y/LOGO_W in the JS). On the CTA screen (.low) it lifts. */
-  #ui{position:fixed;left:0;right:0;top:0;display:flex;flex-direction:column;align-items:center;
-     padding:calc(34vh + env(safe-area-inset-top)) 20px 0;pointer-events:none;text-align:center;
-     transition:padding-top .9s cubic-bezier(.2,.8,.3,1)}
-  #ui.low{padding-top:calc(16vh + env(safe-area-inset-top))}
-  /* photo-hero layout: small headline under the top logo, strong dark shadow for readability
-     over the photo (bright + dark regions). Brand pink kept — it pops on this image. */
-  #tag{font-family:'Frank Ruhl Libre',serif;font-weight:700;color:var(--pink);
-     font-size:clamp(20px,4.5vw,32px);line-height:1.18;letter-spacing:-0.2px;
-     opacity:0;transform:translateY(-8px);
-     transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.25,1);
-     text-shadow:0 1px 2px rgba(0,0,0,.6), 0 2px 12px rgba(0,0,0,.5), 0 4px 28px rgba(0,0,0,.42)}
-  #sub{font-family:'Heebo',sans-serif;font-weight:500;color:rgba(229,72,159,.92);
-     font-size:clamp(12px,3.2vw,16px);letter-spacing:4px;margin-top:10px;
-     opacity:0;transform:translateY(-5px);
-     transition:opacity .9s ease .3s,transform .9s ease .3s;
-     text-shadow:0 1px 3px rgba(0,0,0,.65), 0 2px 14px rgba(0,0,0,.5)}
-  #sub.show{opacity:1;transform:none}
-  #tag.show{opacity:1;transform:none}
-  .badge{position:fixed;left:0;top:0;transform:translate(-50%,-50%) scale(.9);opacity:0;
-     pointer-events:none;display:inline-flex;align-items:baseline;gap:6px;text-decoration:none;cursor:pointer;
-     background:rgba(255,255,255,.92);border:1.5px solid rgba(229,72,159,.35);
-     padding:6px 12px;border-radius:999px;box-shadow:0 8px 24px rgba(229,72,159,.22);white-space:nowrap;
-     backdrop-filter:blur(6px);
-     transition:opacity .7s ease,transform .35s cubic-bezier(.2,.9,.3,1.2)}
-  .badge.on{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
-  .badge.hot{transform:translate(-50%,-50%) scale(1.07)}
-  .badge b{font-family:'Heebo',sans-serif;font-weight:700;color:var(--pink);font-size:clamp(14px,3.7vw,17px);line-height:1}
-  .badge span{font-family:'Heebo',sans-serif;font-weight:500;color:rgba(229,72,159,.7);font-size:clamp(11px,2.9vw,13px);line-height:1}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BAGALIL · האירועים הקרובים בגליל</title>
+<meta name="description" content="פסטיבלי יין ומוזיקה בגליל. כרטיסים לאירועים הקרובים.">
+<meta name="theme-color" content="#12080a">
 
-  .ripple{position:fixed;left:0;top:0;transform:translate(-50%,-50%);pointer-events:none;opacity:0;
-     width:1px;height:1px;transition:opacity .8s ease}
-  .ripple.on{opacity:1}
-  .ripple i{position:absolute;left:50%;top:50%;width:var(--rs,120px);height:var(--rs,120px);
-     margin-left:calc(var(--rs,120px)/-2);margin-top:calc(var(--rs,120px)/-2);
-     border:2px solid rgba(229,72,159,.55);border-radius:50%;
-     animation:rip 2.8s cubic-bezier(.2,.7,.3,1) infinite}
-  .ripple i:nth-child(2){animation-delay:1.4s}
-  @keyframes rip{
-    0%{transform:scale(.62);opacity:0}
-    18%{opacity:.75}
-    100%{transform:scale(1.42);opacity:0}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    /* Reduced palette — pink is now an accent, not the theme */
+    --pink:#E5489F;
+    --pink-dark:#C63285;
+    --pink-soft:rgba(229,72,159,.10);
+    --cream:#FBF5EC;
+    --cream-warm:#F4EBD9;
+    --wine:#12080a;          /* deep wine-black for hero */
+    --wine-warm:#2b1620;     /* dark warm for community section */
+    --ink:#141414;
+    --ink-soft:#3a3a3a;
+    --muted:#6b6b6b;
+    --muted-dark:rgba(255,255,255,.55);
+    --serif:'Frank Ruhl Libre', serif;
+    --sans:'Heebo', sans-serif;
+    --shadow-md: 0 12px 40px rgba(20,20,20,.08);
+    --shadow-lg: 0 24px 60px rgba(20,20,20,.15);
+    --shadow-xl: 0 30px 80px rgba(20,20,20,.25);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  img,video{display:block;max-width:100%}
+
+  /* ---- Header (cream) ---- */
+  header{
+    padding:1.15rem 1.5rem .3rem;
+    text-align:center;
+    position:relative;
+    z-index:5;
+    background:var(--cream);
+  }
+  .logo3d{
+    display:inline-block;
+    height:56px;
+    width:auto;
+    filter:drop-shadow(0 6px 12px rgba(229,72,159,.18));
+    animation:float 4s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-3px)}
+  }
+
+  /* ---- Hero section (dark wine) ---- */
+  .hero-wrap{
+    background:var(--wine);
+    padding-bottom:0;
+  }
+  .hero{
+    position:relative;
+    width:100%;
+    aspect-ratio:9/16;
+    max-height:72vh;
+    overflow:hidden;
+    background:var(--wine);
+    margin:.5rem auto 0;
+  }
+  .hero video{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:2;
+  }
+  .hero-frame{
+    position:absolute;inset:0;z-index:3;pointer-events:none;
+    background:linear-gradient(180deg, rgba(0,0,0,.35) 0%, transparent 22%, transparent 55%, rgba(0,0,0,.6) 100%);
+  }
+
+  /* LIVE indicator */
+  .live{
+    position:absolute;
+    top:1.15rem;right:1.15rem;
+    z-index:5;
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    padding:.4rem .75rem .4rem .55rem;
+    background:rgba(0,0,0,.4);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border-radius:999px;
+    color:#fff;
+    font-size:.65rem;
+    letter-spacing:.15em;
+    font-weight:700;
+    text-transform:uppercase;
+  }
+  .live-dot{
+    width:7px;height:7px;
+    background:#ff4444;
+    border-radius:50%;
+    animation:pulse 1.8s ease-in-out infinite;
+    flex-shrink:0;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:.7;box-shadow:0 0 0 0 rgba(255,68,68,.65)}
+    50%{opacity:1;box-shadow:0 0 0 6px rgba(255,68,68,0)}
+  }
+
+  /* Floating event teaser */
+  .teaser-wrap{
+    position:relative;
+    max-width:520px;
+    margin:-3rem auto 0;
+    padding:0 1.25rem;
+    z-index:10;
+  }
+  .teaser{
+    display:flex;align-items:center;gap:.95rem;
+    background:#fff;
+    border-radius:18px;
+    padding:.9rem 1.05rem;
+    box-shadow:var(--shadow-xl);
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .teaser:hover{
+    transform:translateY(-3px);
+    box-shadow:0 40px 90px rgba(20,20,20,.28);
+  }
+  .teaser-date{
+    flex:0 0 auto;
+    text-align:center;
+    background:var(--pink-soft);
+    padding:.65rem .85rem;
+    border-radius:12px;
+    min-width:62px;
+  }
+  .teaser-date-day{
+    display:block;
+    font-family:var(--serif);
+    font-weight:900;
+    font-size:1.55rem;
+    color:var(--pink);
+    line-height:1;
+  }
+  .teaser-date-mon{
+    display:block;
+    font-size:.6rem;
+    letter-spacing:.2em;
+    color:var(--pink);
+    text-transform:uppercase;
+    margin-top:.2rem;
+    font-weight:700;
+  }
+  .teaser-info{flex:1;min-width:0}
+  .teaser-label{
+    font-size:.58rem;letter-spacing:.3em;
+    color:var(--muted);text-transform:uppercase;
+    margin-bottom:.15rem;font-weight:700;
+  }
+  .teaser-title{
+    font-family:var(--serif);font-weight:700;
+    font-size:1rem;line-height:1.2;color:var(--ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .teaser-cta{
+    flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    width:40px;height:40px;
+    background:var(--pink);color:#fff;
+    border-radius:50%;
+    font-size:1.15rem;font-weight:900;font-family:var(--serif);
+    box-shadow:0 6px 16px rgba(229,72,159,.35);
+    transition:transform .25s ease, background .25s ease;
+  }
+  .teaser:hover .teaser-cta{transform:translateX(-3px);background:var(--pink-dark)}
+
+  /* ---- Hills separator ---- */
+  .hills-sep{
+    display:block;
+    width:100%;
+    height:32px;
+    color:var(--pink);
+    opacity:.4;
+    margin:0;
+  }
+  .hills-sep.light{color:rgba(255,255,255,.5)}
+
+  /* ---- Events section (cream) ---- */
+  .events{
+    background:var(--cream);
+    padding:4rem 1.25rem 3rem;
+  }
+  .events-inner{max-width:600px;margin:0 auto}
+  .section-head{
+    text-align:center;
+    margin-bottom:2.75rem;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:.75rem;
+    font-size:.65rem;letter-spacing:.4em;
+    color:var(--muted);font-weight:700;
+    margin-bottom:1rem;text-transform:uppercase;
+  }
+  .eyebrow::before, .eyebrow::after{
+    content:'';display:block;width:22px;height:1px;
+    background:currentColor;opacity:.5;
+  }
+  .section-title{
+    font-family:var(--serif);font-weight:900;
+    font-size:clamp(2.5rem, 10vw, 4rem);
+    line-height:1;letter-spacing:-.02em;
+    color:var(--ink);
+  }
+
+  /* Event card */
+  .event{
+    background:#fff;border-radius:20px;overflow:hidden;
+    box-shadow:var(--shadow-md);
+    transition:transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease;
+    position:relative;
+  }
+  .event-graphic{
+    width:100%;aspect-ratio:1/1;object-fit:cover;display:block;
+  }
+  .event-body{padding:1.4rem 1.4rem 1.6rem}
+  .event-loc{
+    display:inline-flex;align-items:center;gap:.35rem;
+    font-size:.72rem;letter-spacing:.08em;
+    color:var(--muted);
+    margin-bottom:.9rem;
+    font-weight:500;
+  }
+  .event-loc svg{
+    width:12px;height:12px;flex-shrink:0;
+    color:var(--pink);
+  }
+  .event-meta{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:1.15rem;gap:1rem;
+  }
+  .event-price-label{
+    font-size:.65rem;letter-spacing:.18em;
+    color:var(--muted);text-transform:uppercase;
+    margin-bottom:.15rem;
+  }
+  .event-price{
+    font-family:var(--serif);font-weight:900;
+    font-size:1.85rem;line-height:1;color:var(--ink);
+  }
+  .event-tag{
+    display:inline-block;background:transparent;
+    color:var(--ink);padding:.4rem 0;
+    font-size:.72rem;
+    font-weight:700;letter-spacing:.1em;white-space:nowrap;
+    text-transform:uppercase;
+  }
+  .event-cta{
+    display:flex;align-items:center;justify-content:center;gap:.5rem;
+    background:var(--pink);color:#fff;
+    padding:1.05rem 1.5rem;border-radius:999px;
+    font-weight:700;font-size:1rem;letter-spacing:.02em;
+    transition:background .2s ease, transform .2s ease;
+  }
+  .event-cta:hover, .event-cta:focus-visible{background:var(--pink-dark)}
+  .event-cta:active{transform:scale(.98)}
+  .event-cta .arrow{
+    transition:transform .3s ease;
+    font-family:var(--serif);font-weight:900;font-size:1.1rem;
+  }
+  .event-cta:hover .arrow{transform:translateX(-4px)}
+
+  .event-ghost{
+    background:transparent;border:1.5px dashed rgba(20,20,20,.12);
+    border-radius:20px;padding:2.5rem 1.5rem;
+    text-align:center;
+    display:flex;flex-direction:column;justify-content:center;
+    min-height:420px;
+  }
+  .event-ghost-eyebrow{
+    font-size:.6rem;letter-spacing:.4em;
+    color:var(--muted);text-transform:uppercase;
+    margin-bottom:.4rem;opacity:.6;
+  }
+  .event-ghost-title{
+    font-family:var(--serif);font-weight:700;
+    font-size:1.05rem;color:var(--ink-soft);opacity:.6;
+  }
+
+  /* ---- Carousel ---- */
+  .carousel{position:relative}
+  .carousel-track{
+    display:flex;
+    gap:.85rem;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    padding:.75rem 1.25rem 1.5rem;
+    margin:-.75rem -1.25rem 0;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .carousel-track::-webkit-scrollbar{display:none}
+  .slide{
+    flex:0 0 88%;
+    scroll-snap-align:center;
+    scroll-snap-stop:always;
+    transition:transform .45s cubic-bezier(.2,.7,.2,1), opacity .45s ease, filter .45s ease;
+    transform:scale(.94);
+    opacity:.5;
+    filter:saturate(.85);
+  }
+  .slide.is-active{
+    transform:scale(1);
+    opacity:1;
+    filter:saturate(1);
+  }
+  .dots{
+    display:flex;
+    justify-content:center;
+    gap:.4rem;
+    margin-top:.75rem;
+    padding:0;
+  }
+  .dot{
+    width:6px;height:6px;
+    border-radius:50%;
+    border:none;
+    background:rgba(20,20,20,.18);
+    cursor:pointer;
+    padding:0;
+    transition:background .3s ease, transform .3s ease;
+  }
+  .dot.active{
+    background:var(--pink);
+    transform:scale(1.5);
+  }
+
+  /* ---- Community section (dark warm) ---- */
+  .community{
+    position:relative;
+    padding:5rem 1.5rem 4.5rem;
+    background:var(--wine-warm);
+    color:#fff;
+    text-align:center;
+    overflow:hidden;
+  }
+  .community-watermark{
+    position:absolute;
+    bottom:-40px;
+    left:50%;
+    transform:translateX(-50%);
+    width:150%;
+    max-width:800px;
+    opacity:.06;
+    pointer-events:none;
+    color:#fff;
+  }
+  .community-inner{
+    position:relative;
+    z-index:2;
+    max-width:440px;
+    margin:0 auto;
+  }
+  .community-eyebrow{
+    font-size:.65rem;letter-spacing:.4em;
+    color:var(--pink);font-weight:700;
+    margin-bottom:.85rem;text-transform:uppercase;
+  }
+  .community-title{
+    font-family:var(--serif);font-weight:900;
+    font-size:clamp(2rem, 7vw, 2.75rem);
+    line-height:1.1;margin-bottom:.55rem;
+    color:#fff;
+    letter-spacing:-.01em;
+  }
+  .community-sub{
+    color:rgba(255,255,255,.7);
+    font-size:.92rem;
+    margin-bottom:1.25rem;
+    line-height:1.6;
+  }
+  .community-proof{
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    font-size:.75rem;
+    color:rgba(255,255,255,.55);
+    margin-bottom:2rem;
+    letter-spacing:.05em;
+  }
+  .community-proof strong{
+    color:#fff;
+    font-weight:700;
+  }
+  .community-proof-dot{
+    width:5px;height:5px;
+    background:#4dc26e;
+    border-radius:50%;
+    box-shadow:0 0 0 3px rgba(77,194,110,.2);
+  }
+  .community-buttons{
+    display:flex;flex-direction:column;gap:.7rem;
+  }
+  .community-btn{
+    display:flex;align-items:center;justify-content:center;gap:.7rem;
+    padding:1rem 1.5rem;border-radius:999px;
+    font-weight:700;font-size:.95rem;letter-spacing:.02em;
+    transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .community-btn:hover{transform:translateY(-2px)}
+  .btn-wa{
+    background:#25D366;color:#fff;
+    box-shadow:0 8px 24px rgba(37,211,102,.35);
+  }
+  .btn-wa:hover{box-shadow:0 14px 32px rgba(37,211,102,.45)}
+  .btn-ig{
+    background:transparent;color:#fff;
+    border:1.5px solid rgba(255,255,255,.35);
+  }
+  .btn-ig:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5)}
+  .btn-icon{width:20px;height:20px;flex-shrink:0}
+
+  /* ---- Footer ---- */
+  footer{
+    background:var(--wine-warm);
+    color:rgba(255,255,255,.55);
+    text-align:center;
+    padding:2rem 1.25rem 2.5rem;
+    position:relative;
+  }
+  .footer-sign{
+    font-family:var(--serif);
+    font-size:.95rem;
+    color:rgba(255,255,255,.75);
+    margin-bottom:.75rem;
+  }
+  .footer-sign a{
+    color:var(--pink);
+    font-weight:500;
+    transition:color .2s ease;
+  }
+  .footer-sign a:hover{color:#fff}
+  .footer-meta{
+    font-size:.6rem;letter-spacing:.3em;
+    text-transform:uppercase;
+    opacity:.5;
+  }
+
+  @media (min-width:900px){
+    .hero{
+      aspect-ratio:16/6;max-height:60vh;
+      max-width:1400px;border-radius:0 0 32px 32px;
+    }
+    .hero video{object-position:center 30%}
+    .events-inner{max-width:1200px}
+    .events{padding:5rem 2rem 4rem}
+    .carousel-track{
+      display:grid;grid-template-columns:repeat(3, 1fr);gap:1.5rem;
+      overflow:visible;padding:0;margin:0;
+    }
+    .slide{
+      flex:none;scroll-snap-align:none;
+      transform:none;opacity:1;filter:none;
+    }
+    .dots{display:none}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+    .hero video{display:none}
   }
 </style>
 </head>
 <body>
-<div id="scene">
-  <picture>
-    <source media="(max-width:767px)" srcset="hero-mobile.webp" type="image/webp">
-    <source srcset="hero.webp" type="image/webp">
-    <img src="hero.jpg" alt="" fetchpriority="high" decoding="async">
-  </picture>
-</div>
-<div id="boot"><div class="bootDot"></div><div class="bootDot"></div><div class="bootDot"></div></div>
-<div id="nogl">
-  <h1>האירועים הכי שווים בגליל</h1>
-  <p>יין | מוזיקה | חופש</p>
-  <div class="nglBtns">
-    <a class="nglBtn" href="https://chat.whatsapp.com/JPlYEQ2D0dxEZKJDwsSC8v?s=cl&p=i&mlu=0" target="_blank" rel="noopener">הצטרפו לקהילה · 600+</a>
-    <a class="nglBtn alt" href="https://www.instagram.com/bagalil2025?igsh=Y3pkOHZ5OWhuMDVy&utm_source=qr" target="_blank" rel="noopener">עקבו אחרינו · 2,000+</a>
+
+<header>
+  <img src="logo-3d.webp" alt="BAGALIL" class="logo3d">
+</header>
+
+<div class="hero-wrap">
+  <div class="hero">
+    <video autoplay muted loop playsinline preload="auto">
+      <source src="party.mp4" type="video/mp4">
+    </video>
+    <div class="hero-frame"></div>
+    <div class="live">
+      <span class="live-dot" aria-hidden="true"></span>
+      <span>אווירה · מהאירוע האחרון</span>
+    </div>
+  </div>
+
+  <div class="teaser-wrap">
+    <a href="#events" class="teaser" data-event="teaser-recanati">
+      <div class="teaser-date">
+        <span class="teaser-date-day">14</span>
+        <span class="teaser-date-mon">Aug</span>
+      </div>
+      <div class="teaser-info">
+        <div class="teaser-label">האירוע הבא</div>
+        <div class="teaser-title">פסטיבל היין · יקב רקנאטי</div>
+      </div>
+      <span class="teaser-cta" aria-label="עבור לכרטיסים">↓</span>
+    </a>
   </div>
 </div>
-<canvas id="c"></canvas>
-<div id="washTop"></div>
-<div id="washBot"></div>
-<div id="vig"></div>
-<div id="grain"></div>
-<div id="cue"><span>גללו</span><span class="arrow"></span></div>
-<div id="flash"></div>
-<div id="ui">
-  <div id="tag">האירועים הכי שווים בגליל</div>
-  <div id="sub">יין | מוזיקה | חופש</div>
-</div>
-<div class="ripple" id="ripWA"><i></i><i></i></div>
-<div class="ripple" id="ripIG"><i></i><i></i></div>
-<a class="badge" id="orbWA" href="https://chat.whatsapp.com/JPlYEQ2D0dxEZKJDwsSC8v?s=cl&p=i&mlu=0" target="_blank" rel="noopener"><b>600+</b><span>בקהילה</span></a>
-<a class="badge" id="orbIG" href="https://www.instagram.com/bagalil2025?igsh=Y3pkOHZ5OWhuMDVy&utm_source=qr" target="_blank" rel="noopener"><b>2,000+</b><span>עוקבים</span></a>
-<div id="spacer"></div>
 
-<script type="importmap">
-{ "imports": {
-  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-}}
-</script>
-<script type="module">
-import * as THREE from 'three';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+<svg class="hills-sep" viewBox="0 0 400 30" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0,17 C50,4 100,26 150,13 S250,22 300,8 S400,17 400,17" stroke="currentColor" fill="none" stroke-width="1.5" opacity=".55"/>
+  <path d="M0,23 C60,10 120,30 180,17 S280,26 340,12 S400,22 400,22" stroke="currentColor" fill="none" stroke-width="1" opacity=".35"/>
+</svg>
 
-const CONTOURS = [{"outer":[[0.676,-0.005],[0.662,-0.006],[0.647,-0.009],[0.633,-0.011],[0.619,-0.015],[0.599,-0.021],[0.586,-0.025],[0.573,-0.031],[0.56,-0.036],[0.54,-0.043],[0.527,-0.048],[0.513,-0.052],[0.499,-0.056],[0.478,-0.06],[0.464,-0.062],[0.449,-0.064],[0.435,-0.065],[0.42,-0.066],[0.398,-0.064],[0.383,-0.062],[0.37,-0.058],[0.356,-0.053],[0.336,-0.048],[0.322,-0.044],[0.308,-0.041],[0.294,-0.038],[0.272,-0.035],[0.258,-0.034],[0.243,-0.034],[0.228,-0.034],[0.213,-0.035],[0.191,-0.038],[0.177,-0.04],[0.163,-0.043],[0.149,-0.046],[0.129,-0.052],[0.115,-0.056],[0.102,-0.06],[0.088,-0.065],[0.068,-0.071],[0.055,-0.076],[0.042,-0.081],[0.029,-0.086],[0.015,-0.091],[-0.005,-0.098],[-0.018,-0.103],[-0.031,-0.108],[-0.044,-0.112],[-0.065,-0.116],[-0.078,-0.116],[-0.092,-0.113],[-0.105,-0.109],[-0.126,-0.103],[-0.139,-0.099],[-0.153,-0.096],[-0.167,-0.092],[-0.181,-0.089],[-0.202,-0.085],[-0.216,-0.083],[-0.231,-0.082],[-0.246,-0.081],[-0.269,-0.08],[-0.284,-0.08],[-0.298,-0.081],[-0.313,-0.082],[-0.335,-0.085],[-0.349,-0.088],[-0.363,-0.091],[-0.377,-0.094],[-0.391,-0.097],[-0.412,-0.102],[-0.426,-0.104],[-0.44,-0.105],[-0.455,-0.104],[-0.477,-0.101],[-0.491,-0.098],[-0.504,-0.095],[-0.518,-0.09],[-0.538,-0.084],[-0.551,-0.078],[-0.564,-0.072],[-0.576,-0.066],[-0.589,-0.059],[-0.608,-0.049],[-0.62,-0.043],[-0.633,-0.038],[-0.647,-0.033],[-0.667,-0.027],[-0.681,-0.024],[-0.694,-0.023],[-0.705,-0.028],[-0.713,-0.044],[-0.713,-0.058],[-0.712,-0.073],[-0.71,-0.088],[-0.708,-0.102],[-0.705,-0.124],[-0.702,-0.138],[-0.7,-0.152],[-0.696,-0.166],[-0.691,-0.186],[-0.688,-0.2],[-0.684,-0.214],[-0.679,-0.227],[-0.672,-0.247],[-0.668,-0.26],[-0.662,-0.274],[-0.657,-0.286],[-0.651,-0.299],[-0.642,-0.318],[-0.635,-0.331],[-0.629,-0.343],[-0.622,-0.356],[-0.611,-0.374],[-0.604,-0.386],[-0.596,-0.398],[-0.588,-0.41],[-0.575,-0.428],[-0.566,-0.439],[-0.557,-0.451],[-0.548,-0.462],[-0.534,-0.479],[-0.524,-0.489],[-0.514,-0.5],[-0.504,-0.51],[-0.493,-0.521],[-0.477,-0.536],[-0.466,-0.546],[-0.455,-0.555],[-0.444,-0.565],[-0.426,-0.578],[-0.414,-0.586],[-0.403,-0.595],[-0.391,-0.602],[-0.372,-0.614],[-0.36,-0.621],[-0.348,-0.628],[-0.335,-0.634],[-0.323,-0.641],[-0.304,-0.65],[-0.291,-0.656],[-0.278,-0.661],[-0.265,-0.667],[-0.245,-0.674],[-0.232,-0.678],[-0.218,-0.683],[-0.204,-0.687],[-0.184,-0.693],[-0.17,-0.696],[-0.156,-0.699],[-0.142,-0.702],[-0.128,-0.705],[-0.107,-0.709],[-0.093,-0.711],[-0.078,-0.713],[-0.063,-0.714],[-0.041,-0.715],[-0.026,-0.716],[-0.011,-0.716],[0.004,-0.716],[0.027,-0.716],[0.042,-0.715],[0.057,-0.714],[0.072,-0.713],[0.086,-0.711],[0.108,-0.708],[0.122,-0.705],[0.136,-0.702],[0.15,-0.699],[0.171,-0.694],[0.184,-0.691],[0.198,-0.686],[0.211,-0.682],[0.231,-0.675],[0.244,-0.67],[0.258,-0.665],[0.271,-0.66],[0.284,-0.654],[0.303,-0.646],[0.316,-0.639],[0.328,-0.633],[0.341,-0.626],[0.359,-0.616],[0.371,-0.608],[0.383,-0.6],[0.395,-0.592],[0.413,-0.58],[0.424,-0.571],[0.436,-0.562],[0.447,-0.553],[0.458,-0.544],[0.475,-0.529],[0.485,-0.52],[0.496,-0.51],[0.506,-0.499],[0.521,-0.483],[0.53,-0.472],[0.54,-0.461],[0.549,-0.45],[0.562,-0.432],[0.571,-0.421],[0.579,-0.409],[0.587,-0.397],[0.595,-0.385],[0.606,-0.367],[0.613,-0.355],[0.62,-0.342],[0.627,-0.33],[0.636,-0.311],[0.642,-0.298],[0.648,-0.285],[0.653,-0.272],[0.661,-0.253],[0.666,-0.239],[0.67,-0.226],[0.675,-0.212],[0.679,-0.199],[0.684,-0.178],[0.687,-0.164],[0.69,-0.15],[0.693,-0.136],[0.696,-0.115],[0.698,-0.1],[0.7,-0.086],[0.702,-0.071],[0.703,-0.049],[0.704,-0.034],[0.701,-0.021],[0.694,-0.011]],"holes":[[[-0.394,-0.435],[-0.379,-0.435],[-0.365,-0.435],[-0.35,-0.435],[-0.335,-0.437],[-0.314,-0.439],[-0.299,-0.441],[-0.285,-0.443],[-0.272,-0.446],[-0.251,-0.45],[-0.237,-0.454],[-0.224,-0.457],[-0.21,-0.461],[-0.197,-0.465],[-0.177,-0.471],[-0.164,-0.475],[-0.151,-0.48],[-0.138,-0.485],[-0.118,-0.492],[-0.105,-0.497],[-0.092,-0.502],[-0.079,-0.507],[-0.066,-0.512],[-0.047,-0.519],[-0.034,-0.524],[-0.021,-0.529],[-0.008,-0.534],[0.012,-0.541],[0.025,-0.546],[0.038,-0.55],[0.051,-0.554],[0.071,-0.561],[0.085,-0.564],[0.098,-0.568],[0.112,-0.572],[0.125,-0.575],[0.146,-0.58],[0.16,-0.582],[0.174,-0.584],[0.188,-0.587],[0.209,-0.59],[0.224,-0.591],[0.238,-0.593],[0.253,-0.593],[0.267,-0.594],[0.289,-0.595],[0.304,-0.595],[0.317,-0.595],[0.324,-0.597],[0.319,-0.605],[0.307,-0.612],[0.294,-0.618],[0.282,-0.624],[0.269,-0.63],[0.25,-0.638],[0.237,-0.642],[0.224,-0.647],[0.211,-0.652],[0.191,-0.658],[0.178,-0.662],[0.164,-0.666],[0.151,-0.669],[0.13,-0.674],[0.116,-0.677],[0.102,-0.68],[0.088,-0.682],[0.074,-0.684],[0.052,-0.686],[0.038,-0.686],[0.023,-0.688],[0.008,-0.688],[-0.013,-0.688],[-0.028,-0.687],[-0.043,-0.686],[-0.058,-0.686],[-0.072,-0.684],[-0.093,-0.682],[-0.107,-0.679],[-0.122,-0.677],[-0.136,-0.674],[-0.156,-0.67],[-0.17,-0.667],[-0.183,-0.663],[-0.197,-0.659],[-0.21,-0.655],[-0.23,-0.649],[-0.243,-0.644],[-0.256,-0.639],[-0.269,-0.634],[-0.288,-0.625],[-0.3,-0.62],[-0.313,-0.613],[-0.325,-0.607],[-0.344,-0.597],[-0.356,-0.59],[-0.368,-0.583],[-0.38,-0.575],[-0.391,-0.567],[-0.409,-0.555],[-0.42,-0.547],[-0.431,-0.538],[-0.442,-0.528],[-0.459,-0.514],[-0.47,-0.504],[-0.48,-0.493],[-0.491,-0.483],[-0.501,-0.472],[-0.508,-0.458],[-0.505,-0.451],[-0.494,-0.447],[-0.48,-0.444],[-0.459,-0.441],[-0.445,-0.439],[-0.431,-0.437],[-0.416,-0.436]],[[-0.476,-0.298],[-0.461,-0.297],[-0.447,-0.297],[-0.432,-0.297],[-0.417,-0.297],[-0.395,-0.298],[-0.381,-0.3],[-0.367,-0.301],[-0.353,-0.304],[-0.332,-0.307],[-0.318,-0.31],[-0.305,-0.313],[-0.291,-0.317],[-0.272,-0.322],[-0.259,-0.327],[-0.245,-0.331],[-0.233,-0.336],[-0.22,-0.34],[-0.2,-0.348],[-0.188,-0.353],[-0.175,-0.358],[-0.162,-0.363],[-0.143,-0.371],[-0.131,-0.376],[-0.118,-0.381],[-0.105,-0.387],[-0.086,-0.395],[-0.073,-0.4],[-0.061,-0.405],[-0.048,-0.41],[-0.029,-0.418],[-0.016,-0.422],[-0.003,-0.427],[0.01,-0.432],[0.023,-0.436],[0.042,-0.443],[0.055,-0.447],[0.069,-0.451],[0.082,-0.455],[0.102,-0.46],[0.115,-0.464],[0.129,-0.467],[0.142,-0.47],[0.163,-0.474],[0.177,-0.476],[0.191,-0.478],[0.205,-0.48],[0.219,-0.481],[0.241,-0.483],[0.255,-0.484],[0.27,-0.485],[0.285,-0.485],[0.307,-0.485],[0.321,-0.484],[0.336,-0.483],[0.35,-0.481],[0.371,-0.479],[0.385,-0.477],[0.399,-0.474],[0.413,-0.471],[0.433,-0.467],[0.447,-0.464],[0.46,-0.46],[0.473,-0.456],[0.486,-0.452],[0.504,-0.447],[0.509,-0.448],[0.507,-0.454],[0.499,-0.464],[0.484,-0.48],[0.474,-0.49],[0.463,-0.501],[0.453,-0.51],[0.436,-0.525],[0.426,-0.534],[0.414,-0.543],[0.403,-0.551],[0.384,-0.559],[0.37,-0.562],[0.356,-0.563],[0.342,-0.565],[0.327,-0.566],[0.305,-0.567],[0.291,-0.567],[0.276,-0.566],[0.262,-0.566],[0.24,-0.564],[0.226,-0.563],[0.211,-0.561],[0.197,-0.56],[0.176,-0.556],[0.163,-0.553],[0.149,-0.55],[0.135,-0.547],[0.122,-0.545],[0.102,-0.539],[0.088,-0.536],[0.075,-0.532],[0.062,-0.528],[0.042,-0.521],[0.029,-0.517],[0.016,-0.512],[0.003,-0.508],[-0.016,-0.501],[-0.029,-0.496],[-0.042,-0.49],[-0.054,-0.485],[-0.073,-0.478],[-0.086,-0.473],[-0.099,-0.468],[-0.112,-0.463],[-0.125,-0.459],[-0.144,-0.452],[-0.157,-0.447],[-0.17,-0.443],[-0.183,-0.439],[-0.203,-0.433],[-0.216,-0.429],[-0.23,-0.425],[-0.243,-0.422],[-0.264,-0.418],[-0.278,-0.415],[-0.291,-0.413],[-0.305,-0.411],[-0.32,-0.409],[-0.341,-0.407],[-0.356,-0.406],[-0.37,-0.406],[-0.385,-0.406],[-0.407,-0.407],[-0.422,-0.408],[-0.436,-0.409],[-0.45,-0.41],[-0.471,-0.413],[-0.485,-0.416],[-0.499,-0.419],[-0.512,-0.422],[-0.531,-0.423],[-0.542,-0.419],[-0.552,-0.411],[-0.56,-0.399],[-0.568,-0.388],[-0.58,-0.37],[-0.587,-0.358],[-0.594,-0.346],[-0.599,-0.335],[-0.596,-0.322],[-0.587,-0.316],[-0.574,-0.313],[-0.56,-0.31],[-0.54,-0.306],[-0.526,-0.304],[-0.512,-0.301],[-0.498,-0.3]],[[0.435,-0.235],[0.449,-0.236],[0.464,-0.237],[0.478,-0.24],[0.492,-0.242],[0.513,-0.247],[0.526,-0.25],[0.54,-0.254],[0.554,-0.257],[0.574,-0.263],[0.588,-0.268],[0.601,-0.273],[0.609,-0.28],[0.611,-0.294],[0.606,-0.306],[0.6,-0.319],[0.593,-0.331],[0.583,-0.35],[0.575,-0.362],[0.568,-0.374],[0.559,-0.385],[0.543,-0.398],[0.531,-0.404],[0.518,-0.409],[0.505,-0.414],[0.485,-0.422],[0.472,-0.426],[0.458,-0.43],[0.445,-0.434],[0.431,-0.438],[0.41,-0.443],[0.396,-0.446],[0.382,-0.448],[0.368,-0.45],[0.346,-0.453],[0.332,-0.454],[0.317,-0.455],[0.302,-0.456],[0.279,-0.456],[0.264,-0.456],[0.249,-0.455],[0.234,-0.454],[0.213,-0.452],[0.198,-0.45],[0.184,-0.448],[0.17,-0.445],[0.149,-0.441],[0.135,-0.438],[0.121,-0.435],[0.107,-0.432],[0.087,-0.426],[0.074,-0.422],[0.067,-0.417],[0.068,-0.414],[0.077,-0.41],[0.098,-0.405],[0.111,-0.402],[0.125,-0.398],[0.139,-0.394],[0.159,-0.387],[0.172,-0.383],[0.184,-0.377],[0.197,-0.371],[0.216,-0.361],[0.228,-0.354],[0.24,-0.346],[0.251,-0.338],[0.268,-0.324],[0.279,-0.315],[0.29,-0.306],[0.301,-0.297],[0.318,-0.283],[0.33,-0.275],[0.342,-0.267],[0.354,-0.26],[0.373,-0.251],[0.387,-0.246],[0.4,-0.242],[0.414,-0.238]],[[0.32,-0.227],[0.333,-0.227],[0.339,-0.23],[0.337,-0.235],[0.328,-0.242],[0.31,-0.254],[0.298,-0.263],[0.287,-0.272],[0.276,-0.281],[0.259,-0.295],[0.247,-0.305],[0.236,-0.314],[0.224,-0.322],[0.212,-0.33],[0.194,-0.341],[0.181,-0.347],[0.168,-0.353],[0.155,-0.358],[0.135,-0.365],[0.122,-0.369],[0.108,-0.373],[0.094,-0.377],[0.08,-0.38],[0.059,-0.384],[0.045,-0.386],[0.031,-0.388],[0.016,-0.39],[-0.006,-0.391],[-0.02,-0.389],[-0.033,-0.385],[-0.046,-0.38],[-0.059,-0.374],[-0.079,-0.367],[-0.092,-0.361],[-0.105,-0.356],[-0.118,-0.35],[-0.134,-0.342],[-0.136,-0.338],[-0.129,-0.334],[-0.116,-0.331],[-0.102,-0.328],[-0.081,-0.323],[-0.068,-0.32],[-0.054,-0.317],[-0.04,-0.313],[-0.019,-0.308],[-0.006,-0.304],[0.008,-0.3],[0.022,-0.296],[0.035,-0.292],[0.056,-0.286],[0.069,-0.282],[0.082,-0.278],[0.096,-0.273],[0.116,-0.267],[0.13,-0.263],[0.143,-0.259],[0.157,-0.255],[0.17,-0.251],[0.191,-0.246],[0.205,-0.243],[0.219,-0.239],[0.233,-0.237],[0.254,-0.233],[0.269,-0.232],[0.283,-0.23],[0.298,-0.228]],[[-0.319,-0.116],[-0.317,-0.122],[-0.319,-0.132],[-0.322,-0.146],[-0.321,-0.159],[-0.312,-0.178],[-0.303,-0.188],[-0.292,-0.197],[-0.28,-0.204],[-0.261,-0.213],[-0.248,-0.219],[-0.235,-0.224],[-0.222,-0.23],[-0.209,-0.236],[-0.191,-0.246],[-0.18,-0.254],[-0.172,-0.265],[-0.169,-0.276],[-0.175,-0.294],[-0.185,-0.303],[-0.197,-0.309],[-0.209,-0.311],[-0.222,-0.308],[-0.242,-0.301],[-0.256,-0.297],[-0.269,-0.293],[-0.283,-0.289],[-0.303,-0.284],[-0.317,-0.281],[-0.331,-0.278],[-0.345,-0.275],[-0.366,-0.272],[-0.381,-0.271],[-0.395,-0.269],[-0.41,-0.269],[-0.425,-0.268],[-0.448,-0.268],[-0.463,-0.268],[-0.478,-0.269],[-0.492,-0.27],[-0.514,-0.273],[-0.528,-0.275],[-0.542,-0.277],[-0.556,-0.28],[-0.57,-0.283],[-0.591,-0.287],[-0.604,-0.29],[-0.616,-0.289],[-0.625,-0.283],[-0.634,-0.265],[-0.639,-0.253],[-0.644,-0.239],[-0.646,-0.227],[-0.639,-0.214],[-0.628,-0.208],[-0.615,-0.204],[-0.602,-0.199],[-0.589,-0.195],[-0.569,-0.188],[-0.556,-0.182],[-0.543,-0.177],[-0.53,-0.172],[-0.51,-0.165],[-0.497,-0.16],[-0.484,-0.155],[-0.47,-0.151],[-0.457,-0.146],[-0.437,-0.14],[-0.424,-0.136],[-0.41,-0.132],[-0.397,-0.128],[-0.376,-0.123],[-0.362,-0.12],[-0.348,-0.117],[-0.334,-0.114]],[[-0.261,-0.114],[-0.247,-0.111],[-0.232,-0.111],[-0.218,-0.112],[-0.196,-0.116],[-0.182,-0.118],[-0.168,-0.122],[-0.154,-0.125],[-0.133,-0.131],[-0.12,-0.134],[-0.106,-0.139],[-0.092,-0.143],[-0.072,-0.149],[-0.059,-0.154],[-0.045,-0.158],[-0.032,-0.163],[-0.012,-0.17],[0.002,-0.175],[0.015,-0.179],[0.028,-0.184],[0.048,-0.191],[0.062,-0.196],[0.075,-0.2],[0.089,-0.205],[0.109,-0.211],[0.122,-0.216],[0.133,-0.221],[0.136,-0.226],[0.125,-0.234],[0.112,-0.238],[0.098,-0.242],[0.085,-0.247],[0.064,-0.253],[0.051,-0.257],[0.037,-0.262],[0.024,-0.266],[0.003,-0.272],[-0.011,-0.276],[-0.024,-0.28],[-0.038,-0.283],[-0.059,-0.288],[-0.073,-0.292],[-0.087,-0.295],[-0.101,-0.298],[-0.122,-0.303],[-0.132,-0.302],[-0.138,-0.297],[-0.139,-0.287],[-0.139,-0.267],[-0.143,-0.253],[-0.151,-0.242],[-0.161,-0.232],[-0.178,-0.219],[-0.191,-0.212],[-0.204,-0.206],[-0.217,-0.201],[-0.237,-0.193],[-0.25,-0.188],[-0.263,-0.181],[-0.275,-0.174],[-0.289,-0.159],[-0.291,-0.148],[-0.287,-0.136],[-0.279,-0.125]],[[-0.678,-0.06],[-0.669,-0.057],[-0.657,-0.06],[-0.644,-0.064],[-0.624,-0.073],[-0.612,-0.079],[-0.599,-0.086],[-0.587,-0.092],[-0.568,-0.102],[-0.555,-0.107],[-0.542,-0.113],[-0.522,-0.119],[-0.51,-0.124],[-0.506,-0.128],[-0.51,-0.133],[-0.527,-0.141],[-0.541,-0.146],[-0.554,-0.151],[-0.574,-0.158],[-0.587,-0.163],[-0.6,-0.168],[-0.613,-0.173],[-0.633,-0.18],[-0.646,-0.182],[-0.656,-0.18],[-0.666,-0.167],[-0.67,-0.153],[-0.673,-0.139],[-0.675,-0.125],[-0.679,-0.103],[-0.681,-0.089],[-0.682,-0.074]],[[0.665,-0.037],[0.672,-0.044],[0.674,-0.055],[0.673,-0.069],[0.672,-0.083],[0.669,-0.104],[0.667,-0.118],[0.664,-0.131],[0.661,-0.145],[0.657,-0.165],[0.654,-0.179],[0.65,-0.192],[0.646,-0.205],[0.642,-0.218],[0.635,-0.236],[0.627,-0.244],[0.618,-0.246],[0.606,-0.244],[0.586,-0.237],[0.573,-0.233],[0.56,-0.229],[0.547,-0.226],[0.533,-0.223],[0.513,-0.218],[0.5,-0.215],[0.486,-0.212],[0.472,-0.209],[0.452,-0.206],[0.438,-0.204],[0.424,-0.202],[0.41,-0.201],[0.395,-0.2],[0.374,-0.198],[0.359,-0.198],[0.345,-0.198],[0.33,-0.198],[0.309,-0.199],[0.294,-0.2],[0.28,-0.201],[0.266,-0.203],[0.252,-0.204],[0.232,-0.208],[0.218,-0.209],[0.204,-0.209],[0.191,-0.207],[0.171,-0.201],[0.158,-0.197],[0.145,-0.193],[0.132,-0.189],[0.119,-0.185],[0.1,-0.178],[0.087,-0.174],[0.074,-0.17],[0.061,-0.165],[0.042,-0.158],[0.029,-0.154],[0.016,-0.149],[0.003,-0.145],[-0.009,-0.137],[-0.009,-0.132],[-0.001,-0.127],[0.012,-0.123],[0.025,-0.118],[0.044,-0.111],[0.057,-0.106],[0.07,-0.101],[0.082,-0.097],[0.102,-0.09],[0.115,-0.086],[0.128,-0.082],[0.141,-0.078],[0.154,-0.074],[0.174,-0.07],[0.188,-0.067],[0.202,-0.065],[0.216,-0.064],[0.237,-0.063],[0.252,-0.063],[0.266,-0.064],[0.28,-0.065],[0.294,-0.067],[0.314,-0.072],[0.328,-0.075],[0.341,-0.079],[0.354,-0.083],[0.373,-0.089],[0.386,-0.094],[0.399,-0.098],[0.412,-0.102],[0.425,-0.107],[0.445,-0.113],[0.458,-0.117],[0.471,-0.121],[0.484,-0.124],[0.504,-0.129],[0.518,-0.13],[0.531,-0.129],[0.54,-0.123],[0.541,-0.115],[0.528,-0.105],[0.515,-0.101],[0.502,-0.099],[0.489,-0.096],[0.485,-0.09],[0.491,-0.087],[0.504,-0.084],[0.518,-0.081],[0.531,-0.077],[0.55,-0.07],[0.563,-0.065],[0.576,-0.06],[0.588,-0.055],[0.608,-0.048],[0.621,-0.044],[0.634,-0.04],[0.647,-0.037]]]},{"outer":[[0.589,0.351],[0.584,0.343],[0.583,0.33],[0.583,0.317],[0.583,0.303],[0.583,0.283],[0.583,0.27],[0.583,0.256],[0.583,0.242],[0.583,0.222],[0.583,0.209],[0.583,0.195],[0.583,0.182],[0.583,0.162],[0.583,0.148],[0.583,0.134],[0.584,0.121],[0.592,0.109],[0.602,0.105],[0.615,0.105],[0.628,0.105],[0.649,0.105],[0.662,0.105],[0.676,0.105],[0.689,0.105],[0.71,0.105],[0.723,0.105],[0.737,0.105],[0.75,0.105],[0.764,0.112],[0.769,0.121],[0.771,0.134],[0.77,0.144],[0.765,0.151],[0.749,0.155],[0.735,0.155],[0.722,0.155],[0.708,0.155],[0.688,0.155],[0.674,0.155],[0.661,0.155],[0.649,0.158],[0.64,0.169],[0.638,0.181],[0.638,0.194],[0.638,0.208],[0.638,0.228],[0.638,0.241],[0.638,0.255],[0.638,0.269],[0.638,0.289],[0.638,0.302],[0.638,0.316],[0.638,0.329],[0.635,0.347],[0.628,0.354],[0.618,0.357],[0.604,0.357]],"holes":[]},{"outer":[[0.494,0.351],[0.489,0.343],[0.488,0.331],[0.488,0.317],[0.488,0.297],[0.488,0.283],[0.488,0.27],[0.488,0.256],[0.488,0.236],[0.488,0.223],[0.488,0.209],[0.488,0.189],[0.488,0.175],[0.488,0.162],[0.488,0.149],[0.488,0.128],[0.49,0.117],[0.496,0.109],[0.506,0.105],[0.526,0.105],[0.536,0.109],[0.542,0.117],[0.544,0.135],[0.544,0.148],[0.544,0.162],[0.544,0.175],[0.544,0.195],[0.544,0.209],[0.544,0.222],[0.544,0.236],[0.544,0.256],[0.544,0.269],[0.544,0.283],[0.544,0.303],[0.544,0.317],[0.544,0.33],[0.543,0.342],[0.533,0.354],[0.523,0.357],[0.509,0.357]],"holes":[]},{"outer":[[0.283,0.351],[0.278,0.343],[0.277,0.33],[0.277,0.317],[0.277,0.303],[0.277,0.283],[0.277,0.27],[0.277,0.256],[0.277,0.242],[0.277,0.222],[0.277,0.209],[0.277,0.195],[0.277,0.182],[0.277,0.162],[0.277,0.148],[0.277,0.134],[0.278,0.121],[0.286,0.109],[0.296,0.105],[0.309,0.105],[0.323,0.105],[0.343,0.105],[0.356,0.105],[0.37,0.105],[0.383,0.105],[0.404,0.105],[0.417,0.105],[0.431,0.105],[0.444,0.105],[0.458,0.112],[0.463,0.121],[0.465,0.134],[0.464,0.144],[0.459,0.151],[0.443,0.155],[0.429,0.155],[0.416,0.155],[0.402,0.155],[0.382,0.155],[0.368,0.155],[0.355,0.155],[0.343,0.158],[0.334,0.169],[0.332,0.181],[0.332,0.194],[0.332,0.208],[0.332,0.228],[0.332,0.241],[0.332,0.255],[0.332,0.269],[0.332,0.289],[0.332,0.302],[0.332,0.316],[0.332,0.329],[0.329,0.347],[0.322,0.354],[0.312,0.357],[0.298,0.357]],"holes":[]},{"outer":[[0.099,0.352],[0.09,0.344],[0.084,0.332],[0.079,0.319],[0.074,0.306],[0.066,0.287],[0.061,0.274],[0.056,0.262],[0.05,0.249],[0.043,0.23],[0.037,0.217],[0.032,0.204],[0.027,0.191],[0.019,0.172],[0.014,0.16],[0.009,0.147],[0.004,0.134],[-0.001,0.122],[0.002,0.109],[0.012,0.105],[0.026,0.105],[0.039,0.108],[0.053,0.119],[0.059,0.131],[0.064,0.143],[0.072,0.151],[0.09,0.158],[0.105,0.158],[0.12,0.158],[0.135,0.158],[0.157,0.158],[0.17,0.155],[0.18,0.149],[0.188,0.14],[0.193,0.127],[0.204,0.112],[0.215,0.107],[0.229,0.105],[0.242,0.106],[0.253,0.114],[0.253,0.123],[0.248,0.136],[0.242,0.149],[0.235,0.168],[0.23,0.181],[0.224,0.194],[0.219,0.206],[0.214,0.219],[0.206,0.238],[0.201,0.251],[0.196,0.264],[0.191,0.277],[0.183,0.296],[0.178,0.308],[0.172,0.321],[0.167,0.334],[0.157,0.349],[0.146,0.355],[0.132,0.357],[0.117,0.357]],"holes":[[[0.125,0.294],[0.127,0.294],[0.13,0.291],[0.136,0.281],[0.138,0.275],[0.143,0.262],[0.145,0.256],[0.15,0.243],[0.153,0.236],[0.157,0.223],[0.158,0.218],[0.154,0.21],[0.15,0.207],[0.139,0.205],[0.131,0.205],[0.124,0.205],[0.109,0.205],[0.103,0.206],[0.095,0.212],[0.093,0.216],[0.094,0.226],[0.097,0.233],[0.102,0.246],[0.104,0.252],[0.109,0.265],[0.112,0.272],[0.117,0.285],[0.119,0.29]]]},{"outer":[[-0.415,0.352],[-0.424,0.343],[-0.43,0.332],[-0.435,0.319],[-0.443,0.299],[-0.448,0.286],[-0.453,0.274],[-0.459,0.261],[-0.466,0.242],[-0.472,0.229],[-0.477,0.216],[-0.482,0.203],[-0.49,0.184],[-0.495,0.171],[-0.5,0.158],[-0.506,0.145],[-0.513,0.126],[-0.515,0.116],[-0.511,0.108],[-0.501,0.105],[-0.479,0.106],[-0.468,0.112],[-0.46,0.12],[-0.455,0.133],[-0.445,0.149],[-0.434,0.155],[-0.421,0.158],[-0.406,0.158],[-0.384,0.158],[-0.368,0.158],[-0.354,0.158],[-0.341,0.154],[-0.328,0.142],[-0.322,0.13],[-0.316,0.118],[-0.307,0.11],[-0.288,0.105],[-0.274,0.105],[-0.264,0.109],[-0.261,0.117],[-0.266,0.134],[-0.271,0.147],[-0.276,0.16],[-0.281,0.173],[-0.289,0.192],[-0.294,0.205],[-0.299,0.218],[-0.305,0.231],[-0.312,0.25],[-0.318,0.263],[-0.323,0.276],[-0.328,0.288],[-0.336,0.308],[-0.341,0.321],[-0.346,0.333],[-0.353,0.345],[-0.368,0.355],[-0.382,0.357],[-0.397,0.357]],"holes":[[[-0.389,0.294],[-0.387,0.294],[-0.384,0.291],[-0.379,0.281],[-0.376,0.275],[-0.371,0.262],[-0.369,0.256],[-0.364,0.243],[-0.361,0.236],[-0.357,0.223],[-0.356,0.218],[-0.36,0.21],[-0.363,0.207],[-0.375,0.205],[-0.383,0.205],[-0.39,0.205],[-0.405,0.205],[-0.411,0.206],[-0.419,0.212],[-0.421,0.216],[-0.42,0.226],[-0.417,0.233],[-0.412,0.246],[-0.41,0.252],[-0.405,0.265],[-0.402,0.272],[-0.398,0.285],[-0.395,0.29]]]},{"outer":[[-0.724,0.351],[-0.73,0.342],[-0.731,0.329],[-0.731,0.314],[-0.731,0.3],[-0.731,0.279],[-0.731,0.264],[-0.731,0.25],[-0.731,0.235],[-0.731,0.214],[-0.731,0.2],[-0.731,0.185],[-0.731,0.171],[-0.731,0.149],[-0.731,0.135],[-0.73,0.122],[-0.725,0.112],[-0.71,0.105],[-0.696,0.105],[-0.682,0.105],[-0.667,0.105],[-0.646,0.105],[-0.631,0.105],[-0.617,0.105],[-0.603,0.106],[-0.583,0.108],[-0.569,0.111],[-0.557,0.115],[-0.545,0.122],[-0.531,0.135],[-0.524,0.146],[-0.519,0.159],[-0.517,0.172],[-0.519,0.192],[-0.523,0.205],[-0.53,0.216],[-0.54,0.225],[-0.549,0.237],[-0.548,0.244],[-0.541,0.253],[-0.533,0.264],[-0.527,0.282],[-0.526,0.296],[-0.528,0.309],[-0.533,0.321],[-0.545,0.336],[-0.556,0.344],[-0.568,0.349],[-0.581,0.352],[-0.602,0.355],[-0.616,0.356],[-0.63,0.357],[-0.644,0.357],[-0.665,0.357],[-0.68,0.357],[-0.694,0.357],[-0.709,0.357]],"holes":[[[-0.673,0.208],[-0.669,0.212],[-0.658,0.215],[-0.651,0.215],[-0.636,0.215],[-0.622,0.215],[-0.615,0.214],[-0.602,0.213],[-0.589,0.209],[-0.584,0.205],[-0.576,0.196],[-0.572,0.184],[-0.572,0.178],[-0.577,0.166],[-0.585,0.157],[-0.59,0.154],[-0.603,0.15],[-0.61,0.149],[-0.624,0.148],[-0.638,0.148],[-0.645,0.148],[-0.659,0.148],[-0.67,0.152],[-0.674,0.155],[-0.679,0.165],[-0.68,0.179],[-0.68,0.186],[-0.679,0.199]],[[-0.674,0.307],[-0.669,0.31],[-0.658,0.313],[-0.651,0.313],[-0.637,0.313],[-0.63,0.313],[-0.616,0.312],[-0.609,0.312],[-0.597,0.308],[-0.592,0.305],[-0.584,0.296],[-0.582,0.291],[-0.582,0.279],[-0.584,0.274],[-0.591,0.264],[-0.597,0.261],[-0.609,0.257],[-0.616,0.257],[-0.629,0.256],[-0.636,0.256],[-0.651,0.256],[-0.658,0.256],[-0.669,0.259],[-0.673,0.262],[-0.679,0.271],[-0.68,0.277],[-0.68,0.291],[-0.679,0.297]]]},{"outer":[[-0.144,0.362],[-0.158,0.36],[-0.171,0.358],[-0.184,0.354],[-0.197,0.348],[-0.215,0.337],[-0.225,0.328],[-0.235,0.318],[-0.243,0.307],[-0.252,0.288],[-0.257,0.275],[-0.26,0.262],[-0.262,0.248],[-0.262,0.226],[-0.262,0.212],[-0.26,0.198],[-0.256,0.185],[-0.252,0.172],[-0.242,0.153],[-0.234,0.142],[-0.225,0.132],[-0.214,0.123],[-0.196,0.113],[-0.183,0.108],[-0.17,0.104],[-0.156,0.101],[-0.135,0.099],[-0.12,0.099],[-0.106,0.1],[-0.092,0.102],[-0.078,0.104],[-0.058,0.11],[-0.046,0.115],[-0.034,0.122],[-0.024,0.13],[-0.016,0.147],[-0.015,0.162],[-0.015,0.176],[-0.015,0.191],[-0.015,0.213],[-0.016,0.227],[-0.021,0.237],[-0.03,0.243],[-0.044,0.244],[-0.066,0.244],[-0.081,0.244],[-0.096,0.244],[-0.11,0.243],[-0.122,0.234],[-0.126,0.222],[-0.123,0.21],[-0.116,0.203],[-0.097,0.199],[-0.083,0.198],[-0.073,0.193],[-0.067,0.183],[-0.068,0.171],[-0.079,0.157],[-0.091,0.152],[-0.104,0.15],[-0.119,0.148],[-0.14,0.149],[-0.154,0.152],[-0.167,0.157],[-0.178,0.164],[-0.192,0.178],[-0.199,0.191],[-0.203,0.204],[-0.205,0.217],[-0.206,0.232],[-0.204,0.253],[-0.2,0.266],[-0.195,0.279],[-0.187,0.29],[-0.172,0.303],[-0.159,0.309],[-0.146,0.312],[-0.132,0.313],[-0.111,0.31],[-0.099,0.305],[-0.088,0.296],[-0.078,0.288],[-0.068,0.282],[-0.049,0.281],[-0.036,0.283],[-0.028,0.289],[-0.026,0.297],[-0.034,0.315],[-0.042,0.326],[-0.052,0.336],[-0.063,0.345],[-0.081,0.354],[-0.094,0.358],[-0.108,0.361],[-0.122,0.362]],"holes":[]},{"outer":[[-0.014,0.727],[-0.029,0.726],[-0.045,0.725],[-0.06,0.725],[-0.075,0.723],[-0.098,0.721],[-0.113,0.719],[-0.128,0.716],[-0.142,0.713],[-0.164,0.709],[-0.178,0.705],[-0.193,0.701],[-0.207,0.697],[-0.228,0.69],[-0.241,0.685],[-0.255,0.68],[-0.269,0.675],[-0.282,0.669],[-0.302,0.66],[-0.315,0.654],[-0.328,0.647],[-0.341,0.64],[-0.36,0.629],[-0.373,0.621],[-0.385,0.613],[-0.398,0.605],[-0.416,0.592],[-0.428,0.582],[-0.44,0.573],[-0.452,0.564],[-0.464,0.554],[-0.48,0.538],[-0.492,0.527],[-0.502,0.517],[-0.513,0.505],[-0.529,0.489],[-0.535,0.476],[-0.536,0.465],[-0.529,0.46],[-0.513,0.465],[-0.503,0.474],[-0.493,0.486],[-0.482,0.497],[-0.465,0.513],[-0.454,0.524],[-0.442,0.534],[-0.431,0.544],[-0.419,0.553],[-0.401,0.567],[-0.389,0.576],[-0.377,0.584],[-0.364,0.593],[-0.345,0.604],[-0.333,0.612],[-0.32,0.619],[-0.307,0.626],[-0.287,0.635],[-0.274,0.641],[-0.26,0.647],[-0.247,0.653],[-0.233,0.658],[-0.212,0.665],[-0.198,0.669],[-0.184,0.673],[-0.17,0.677],[-0.148,0.682],[-0.134,0.685],[-0.119,0.688],[-0.104,0.691],[-0.082,0.694],[-0.067,0.695],[-0.051,0.696],[-0.036,0.697],[-0.012,0.697],[0.003,0.697],[0.019,0.697],[0.034,0.696],[0.05,0.696],[0.072,0.694],[0.088,0.692],[0.102,0.69],[0.117,0.687],[0.139,0.682],[0.153,0.679],[0.168,0.676],[0.182,0.671],[0.203,0.665],[0.217,0.66],[0.231,0.655],[0.244,0.65],[0.258,0.644],[0.278,0.635],[0.291,0.629],[0.304,0.623],[0.317,0.615],[0.336,0.605],[0.349,0.597],[0.361,0.589],[0.373,0.58],[0.392,0.567],[0.404,0.558],[0.416,0.549],[0.427,0.539],[0.439,0.529],[0.456,0.513],[0.467,0.502],[0.478,0.491],[0.489,0.48],[0.507,0.472],[0.515,0.475],[0.517,0.484],[0.512,0.496],[0.497,0.513],[0.487,0.524],[0.475,0.535],[0.464,0.545],[0.446,0.56],[0.434,0.57],[0.423,0.58],[0.41,0.589],[0.398,0.598],[0.38,0.61],[0.367,0.618],[0.355,0.626],[0.342,0.634],[0.323,0.645],[0.31,0.651],[0.297,0.658],[0.284,0.664],[0.264,0.673],[0.25,0.678],[0.236,0.684],[0.223,0.688],[0.209,0.693],[0.188,0.699],[0.173,0.703],[0.159,0.707],[0.145,0.711],[0.123,0.715],[0.108,0.718],[0.093,0.72],[0.078,0.722],[0.056,0.724],[0.04,0.725],[0.025,0.726],[0.009,0.727]],"holes":[]}];
+<section class="events" id="events">
+  <div class="events-inner">
+    <div class="section-head">
+      <div class="eyebrow">Upcoming</div>
+      <h1 class="section-title">האירועים<br>הקרובים</h1>
+    </div>
 
-// ---------- renderer ----------
-const canvas=document.getElementById('c');
-// --- no-WebGL fallback: show a clean static page instead of a blank screen ---
-(()=>{
-  let ok=false;
-  try{ const t=document.createElement('canvas');
-    ok=!!(window.WebGLRenderingContext && (t.getContext('webgl2')||t.getContext('webgl'))); }catch(e){}
-  if(!ok){
-    document.getElementById('nogl').classList.add('on');
-    document.getElementById('boot').classList.add('gone');
-    throw new Error('[BAGLIL] WebGL unavailable — static fallback shown');
+    <div class="carousel">
+      <div class="carousel-track">
+        <article class="event slide is-active">
+          <img class="event-graphic" src="recanati.webp" alt="פסטיבל היין של יקב רקנאטי · 14.08" loading="eager">
+          <div class="event-body">
+            <div class="event-loc">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s-8-7.58-8-13a8 8 0 1116 0c0 5.42-8 13-8 13z"/>
+                <circle cx="12" cy="9" r="2.5"/>
+              </svg>
+              <span>גליל · יקב רקנאטי</span>
+            </div>
+            <div class="event-meta">
+              <div>
+                <div class="event-price-label">כרטיסים החל מ־</div>
+                <div class="event-price">₪155</div>
+              </div>
+              <span class="event-tag">שישי · 14.08</span>
+            </div>
+            <a href="#" class="event-cta" data-event="recanati-aug-14">
+              <span>לרכישת כרטיסים</span>
+              <span class="arrow">←</span>
+            </a>
+          </div>
+        </article>
+
+        <div class="event-ghost slide">
+          <div class="event-ghost-eyebrow">בקרוב</div>
+          <div class="event-ghost-title">אירוע נוסף</div>
+        </div>
+
+        <div class="event-ghost slide">
+          <div class="event-ghost-eyebrow">בקרוב</div>
+          <div class="event-ghost-title">אירוע נוסף</div>
+        </div>
+      </div>
+      <div class="dots" aria-label="ניווט אירועים">
+        <button class="dot active" data-slide="0" aria-label="אירוע 1"></button>
+        <button class="dot" data-slide="1" aria-label="אירוע 2"></button>
+        <button class="dot" data-slide="2" aria-label="אירוע 3"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="community">
+  <svg class="community-watermark" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <path d="M0,120 C60,80 120,140 180,110 S280,130 340,95 S400,115 400,115 L400,200 L0,200 Z" fill="currentColor"/>
+    <path d="M0,150 C80,110 140,170 200,140 S300,160 360,125 S400,140 400,140 L400,200 L0,200 Z" fill="currentColor" opacity=".6"/>
+  </svg>
+
+  <div class="community-inner">
+    <div class="community-eyebrow">Community</div>
+    <h2 class="community-title">לא לפספס אירוע</h2>
+    <p class="community-sub">הצטרפו לקהילה — מידע ראשוני, הצצות מאחורי הקלעים,<br>וכרטיסים במחיר מוקדם</p>
+
+    <div class="community-proof">
+      <span class="community-proof-dot" aria-hidden="true"></span>
+      <span><strong>600+</strong> חברים כבר בפנים</span>
+    </div>
+
+    <div class="community-buttons">
+      <a href="https://chat.whatsapp.com/JPlYEQ2D0dxEZKJDwsSC8v?s=cl&p=i&mlu=0"
+         class="community-btn btn-wa" target="_blank" rel="noopener">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/>
+        </svg>
+        הצטרפו לקהילת WhatsApp
+      </a>
+      <a href="https://www.instagram.com/bagalil2025?igsh=Y3pkOHZ5OWhuMDVy&utm_source=qr"
+         class="community-btn btn-ig" target="_blank" rel="noopener">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+        </svg>
+        עקבו באינסטגרם · 2,000+
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-sign">
+    נתראה בגליל · <a href="https://www.instagram.com/bagalil2025?igsh=Y3pkOHZ5OWhuMDVy&utm_source=qr" target="_blank" rel="noopener">@bagalil2025 →</a>
+  </div>
+  <div class="footer-meta">BAGALIL · 2026</div>
+</footer>
+
+<script>
+  function track(evt, data){
+    try{
+      if(typeof gtag==='function') gtag('event', evt, data||{});
+      if(typeof fbq==='function') fbq('trackCustom', evt, data||{});
+      if(window.dataLayer) window.dataLayer.push(Object.assign({event:evt}, data||{}));
+    }catch(e){}
+    console.log('[BAGLIL]', evt, data||'');
   }
-})();
-const REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-const scene=new THREE.Scene();
-const CAM_BASE=4.4;
-const camera=new THREE.PerspectiveCamera(40,1,0.1,100); camera.position.set(0,0.25,CAM_BASE);
-const root=new THREE.Group(); scene.add(root);   // everything lives here so it can be scaled to fit
-scene.fog=new THREE.Fog(0xF6EFE4, 6.0, 15.0);    // far particles melt into the warm background
-
-// ---------- environment (HDRI parsed directly: no Worker) ----------
-const pmrem=new THREE.PMREMGenerator(renderer); pmrem.compileEquirectangularShader();
-try{ scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture; }catch(e){}
-// warm studio environment generated in code — same warmth, zero download
-(()=>{
-  const w=512,h=256,cv=document.createElement('canvas'); cv.width=w; cv.height=h;
-  const x=cv.getContext('2d');
-  const g=x.createLinearGradient(0,0,0,h);
-  g.addColorStop(0.00,'#FFFFFF');
-  g.addColorStop(0.32,'#FFF4E6');
-  g.addColorStop(0.60,'#F8E9DC');
-  g.addColorStop(1.00,'#E9D9CD');
-  x.fillStyle=g; x.fillRect(0,0,w,h);
-  const k=x.createRadialGradient(w*0.30,h*0.20,0,w*0.30,h*0.20,h*0.60);
-  k.addColorStop(0,'rgba(255,255,255,1)'); k.addColorStop(1,'rgba(255,255,255,0)');
-  x.fillStyle=k; x.fillRect(0,0,w,h);
-  const p=x.createRadialGradient(w*0.76,h*0.74,0,w*0.76,h*0.74,h*0.65);
-  p.addColorStop(0,'rgba(255,192,226,0.55)'); p.addColorStop(1,'rgba(255,192,226,0)');
-  x.fillStyle=p; x.fillRect(0,0,w,h);
-  const q=x.createRadialGradient(w*0.08,h*0.60,0,w*0.08,h*0.60,h*0.7);
-  q.addColorStop(0,'rgba(255,224,196,0.5)'); q.addColorStop(1,'rgba(255,224,196,0)');
-  x.fillStyle=q; x.fillRect(0,0,w,h);
-  const tex=new THREE.CanvasTexture(cv);
-  tex.mapping=THREE.EquirectangularReflectionMapping;
-  tex.colorSpace=THREE.SRGBColorSpace;
-  tex.needsUpdate=true;
-  scene.environment=pmrem.fromEquirectangular(tex).texture;
-  tex.dispose();
-  console.log('[BAGLIL] procedural warm environment ready (no HDRI download)');
-})();
-
-  // ---------- background: generative 3D layers removed; the hero photo is the scene now ----------
-
-// ---------- lights ----------
-scene.add(new THREE.AmbientLight(0xffffff,0.55));
-const key=new THREE.DirectionalLight(0xffffff,1.6); key.position.set(2,3.5,3); scene.add(key);
-const rim=new THREE.DirectionalLight(0xffd0e6,0.9); rim.position.set(-3,1.5,-2); scene.add(rim);
-const fill=new THREE.DirectionalLight(0xffffff,0.8); fill.position.set(-1,-1,2); scene.add(fill);
-const sweep=new THREE.PointLight(0xffffff,0,14,2); sweep.position.set(-4,1.2,2.2); scene.add(sweep);
-
-// ---------- extruded 3D logo ----------
-function makeShape(s){
-  const sh=new THREE.Shape(); const o=s.outer;
-  sh.moveTo(o[0][0],o[0][1]); for(let i=1;i<o.length;i++) sh.lineTo(o[i][0],o[i][1]); sh.closePath();
-  for(const hole of s.holes){ const p=new THREE.Path(); p.moveTo(hole[0][0],hole[0][1]);
-    for(let i=1;i<hole.length;i++) p.lineTo(hole[i][0],hole[i][1]); p.closePath(); sh.holes.push(p); }
-  return sh;
-}
-const extrude={depth:0.24,bevelEnabled:true,bevelThickness:0.025,bevelSize:0.014,bevelSegments:6,curveSegments:24};
-const pink=new THREE.MeshPhysicalMaterial({color:0xE5489F,metalness:0.0,roughness:0.42,clearcoat:0.5,
-  clearcoatRoughness:0.35,sheen:0.4,sheenColor:0xffc0e0,envMapIntensity:0.70,side:THREE.DoubleSide,
-  transparent:true,opacity:1});
-const group=new THREE.Group();
-const logoGeos=[];
-for(const s of CONTOURS){ const g=new THREE.ExtrudeGeometry(makeShape(s),extrude); g.computeVertexNormals();
-  logoGeos.push(g); group.add(new THREE.Mesh(g,pink)); }
-const box=new THREE.Box3().setFromObject(group); const ctr=new THREE.Vector3(); box.getCenter(ctr);
-const size=new THREE.Vector3(); box.getSize(size);
-group.position.sub(ctr);
-// LAYOUT (photo hero): logo sits small at TOP CENTER so the cheers photo stays visible.
-// Both values are read by logoMatrix below, so the particle morph target moves with the solid
-// logo (stays in sync). Icons are a separate group and are unaffected. TUNE HERE if needed:
-const LOGO_W=1.30;                 // logo world width (was 2.6) -> ~15-18% frame height on mobile
-const LOGO_Y=1.15;                 // vertical lift toward the top (was 0.15, near centre)
-const wrap=new THREE.Group(); wrap.add(group); wrap.position.y=LOGO_Y;
-const LS=LOGO_W/Math.max(size.x,size.y); wrap.scale.setScalar(LS);
-root.add(wrap);
-
-// ---------- soft mirrored reflection ----------
-const reflMat=pink.clone(); reflMat.transparent=true; reflMat.opacity=0.07; reflMat.depthWrite=false; // fainter over the photo
-const reflGroup=group.clone(true); reflGroup.traverse(o=>{ if(o.isMesh) o.material=reflMat; });
-const reflWrap=new THREE.Group(); reflWrap.add(reflGroup);
-reflWrap.scale.copy(wrap.scale); reflWrap.scale.y*=-1;
-reflWrap.position.copy(wrap.position);
-const baseY=-1.02; reflWrap.position.y=2*baseY-wrap.position.y;
-root.add(reflWrap);
-const veilCv=document.createElement('canvas'); veilCv.width=4; veilCv.height=256;
-{ const x=veilCv.getContext('2d'); const g=x.createLinearGradient(0,0,0,256);
-  g.addColorStop(0,'rgba(244,236,223,0)'); g.addColorStop(0.55,'rgba(244,236,223,0.85)'); g.addColorStop(1,'rgba(244,236,223,1)');
-  x.fillStyle=g; x.fillRect(0,0,4,256); }
-const veil=new THREE.Mesh(new THREE.PlaneGeometry(6,3.2),
-  new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(veilCv),transparent:true,depthWrite:false}));
-veil.position.set(0,baseY-1.35,0.6); root.add(veil);
-
-// ---------- particle targets ----------
-const N=14000;
-function rand(a,b){return a+Math.random()*(b-a);}
-// generic area-weighted surface sampler over a list of {geo, matrix}
-function sampleSurfaces(items, n){
-  const out=new Float32Array(n*3);
-  const tris=[]; let total=0;
-  const vA=new THREE.Vector3(),vB=new THREE.Vector3(),vC=new THREE.Vector3(),ab=new THREE.Vector3(),ac=new THREE.Vector3(),cr=new THREE.Vector3();
-  for(const it of items){
-    const g=it.geo, pos=g.attributes.position, idx=g.index;
-    const count = idx? idx.count : pos.count;
-    for(let i=0;i<count;i+=3){
-      const a= idx? idx.getX(i):i, b= idx? idx.getX(i+1):i+1, c= idx? idx.getX(i+2):i+2;
-      vA.fromBufferAttribute(pos,a); vB.fromBufferAttribute(pos,b); vC.fromBufferAttribute(pos,c);
-      ab.subVectors(vB,vA); ac.subVectors(vC,vA); cr.crossVectors(ab,ac);
-      const area=cr.length()*0.5; if(area<=0) continue;
-      total+=area; tris.push({it,a,b,c,cum:total});
-    }
-  }
-  const v=new THREE.Vector3();
-  for(let i=0;i<n;i++){
-    const r=Math.random()*total;
-    let lo=0,hi=tris.length-1;
-    while(lo<hi){ const mid=(lo+hi)>>1; if(tris[mid].cum<r) lo=mid+1; else hi=mid; }
-    const t=tris[lo], pos=t.it.geo.attributes.position;
-    vA.fromBufferAttribute(pos,t.a); vB.fromBufferAttribute(pos,t.b); vC.fromBufferAttribute(pos,t.c);
-    let u=Math.random(), w=Math.random(); if(u+w>1){u=1-u;w=1-w;}
-    v.copy(vA).addScaledVector(ab.subVectors(vB,vA),u).addScaledVector(ac.subVectors(vC,vA),w);
-    v.applyMatrix4(t.it.matrix);
-    out[i*3]=v.x; out[i*3+1]=v.y; out[i*3+2]=v.z;
-  }
-  return out;
-}
-// logo target: geometries transformed into wrap space
-const logoMatrix=new THREE.Matrix4().makeTranslation(0,wrap.position.y,0)
-  .multiply(new THREE.Matrix4().makeScale(LS,LS,LS))
-  .multiply(new THREE.Matrix4().makeTranslation(-ctr.x,-ctr.y,-ctr.z));
-const S_LOGO = sampleSurfaces(logoGeos.map(g=>({geo:g,matrix:logoMatrix})), N);
-
-// ---------- 3D social icons (extruded, same matte pink as the logo) ----------
-const WA_HANDSET="M17.5 14.4c-.3-.15-1.8-.9-2-1s-.5-.15-.7.15-.8 1-.95 1.2-.35.2-.65.05a8 8 0 0 1-2.4-1.5 9 9 0 0 1-1.65-2.05c-.15-.3 0-.45.15-.6l.45-.55c.15-.2.2-.35.3-.55s.05-.4 0-.55-.7-1.7-.95-2.3c-.25-.6-.5-.5-.7-.5h-.6c-.2 0-.55.1-.85.4a3.4 3.4 0 0 0-1.05 2.55c0 1.5 1.1 3 1.25 3.2s2.15 3.3 5.2 4.6c.75.3 1.3.5 1.75.65.75.25 1.4.2 1.9.1.6-.1 1.8-.75 2.05-1.45s.25-1.35.2-1.45-.25-.2-.55-.35z";
-const WA_BUBBLE="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.85-1.5A10 10 0 1 0 12 2z";
-const iconMat=pink.clone(); iconMat.transparent=true; iconMat.opacity=0;
-iconMat.roughness=0.34; iconMat.clearcoat=0.7; iconMat.clearcoatRoughness=0.22; iconMat.envMapIntensity=1.0;
-const glyphMat=iconMat.clone(); glyphMat.color=new THREE.Color(0xFDF8F1); glyphMat.roughness=0.42;
-glyphMat.clearcoat=0.35; glyphMat.sheen=0.15; glyphMat.envMapIntensity=0.55; glyphMat.transparent=true; glyphMat.opacity=0;
-const iconExtrude={depth:0.80,bevelEnabled:true,bevelThickness:0.085,bevelSize:0.055,bevelSegments:9,curveSegments:30};
-
-function shapesFromPath(d){
-  const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="'+d+'"/></svg>';
-  const data=new SVGLoader().parse(svg);
-  const out=[];
-  for(const p of data.paths) for(const sh of SVGLoader.createShapes(p)) out.push(sh);
-  return out;
-}
-function roundedRectShape(x0,y0,x1,y1,r){
-  const s=new THREE.Shape();
-  s.moveTo(x0+r,y0); s.lineTo(x1-r,y0); s.absarc(x1-r,y0+r,r,-Math.PI/2,0,false);
-  s.lineTo(x1,y1-r); s.absarc(x1-r,y1-r,r,0,Math.PI/2,false);
-  s.lineTo(x0+r,y1); s.absarc(x0+r,y1-r,r,Math.PI/2,Math.PI,false);
-  s.lineTo(x0,y0+r); s.absarc(x0+r,y0+r,r,Math.PI,Math.PI*1.5,false);
-  return s;
-}
-function ringPath(cx,cy,r){ const p=new THREE.Path(); p.absarc(cx,cy,r,0,Math.PI*2,true); return p; }
-// turn a filled shape into an OUTLINE (line-art like our logo) by inserting an inset copy as a hole
-function outlineShape(sh,inset){
-  const pts=sh.getPoints(140);
-  let cx=0,cy=0; for(const p of pts){cx+=p.x;cy+=p.y;} cx/=pts.length; cy/=pts.length;
-  const outer=new THREE.Shape();
-  outer.moveTo(pts[0].x,pts[0].y); for(let i=1;i<pts.length;i++) outer.lineTo(pts[i].x,pts[i].y); outer.closePath();
-  const hole=new THREE.Path();
-  const h=pts.map(p=>new THREE.Vector2(cx+(p.x-cx)*inset, cy+(p.y-cy)*inset));
-  hole.moveTo(h[0].x,h[0].y); for(let i=1;i<h.length;i++) hole.lineTo(h[i].x,h[i].y); hole.closePath();
-  outer.holes.push(hole);
-  return outer;
-}
-
-// WhatsApp: SOLID pink bubble + cream handset standing proud of the face
-const glyphExtrude={depth:1.02,bevelEnabled:true,bevelThickness:0.05,bevelSize:0.035,bevelSegments:6,curveSegments:26};
-function buildWA(){
-  const bubble=shapesFromPath(WA_BUBBLE)[0];
-  const body=new THREE.ExtrudeGeometry(bubble,iconExtrude); body.computeVertexNormals();
-  const glyphs=shapesFromPath(WA_HANDSET).map(s=>{
-    const g=new THREE.ExtrudeGeometry(s,glyphExtrude); g.computeVertexNormals(); return g;
+  document.querySelectorAll('[data-event]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      track('ticket_click', {event: el.dataset.event});
+    });
   });
-  return [{geo:body,glyph:false}, ...glyphs.map(g=>({geo:g,glyph:true}))];
-}
-// Instagram: SOLID pink rounded square + cream ring + cream dot
-function buildIG(){
-  const body=new THREE.ExtrudeGeometry(roundedRectShape(2.2,2.2,21.8,21.8,5.6),iconExtrude);
-  body.computeVertexNormals();
-  const ring=new THREE.Shape(); ring.absarc(12,12,5.2,0,Math.PI*2,false); ring.holes.push(ringPath(12,12,3.0));
-  const dot=new THREE.Shape(); dot.absarc(17.5,6.6,1.45,0,Math.PI*2,false);
-  const glyphs=[ring,dot].map(s=>{ const g=new THREE.ExtrudeGeometry(s,glyphExtrude); g.computeVertexNormals(); return g; });
-  return [{geo:body,glyph:false}, ...glyphs.map(g=>({geo:g,glyph:true}))];
-}
+  document.querySelector('.btn-wa')?.addEventListener('click',
+    ()=>track('community_click', {channel:'whatsapp'}));
+  document.querySelector('.btn-ig')?.addEventListener('click',
+    ()=>track('community_click', {channel:'instagram'}));
 
-// normalize an icon's geometry set: center it, flip Y (SVG is y-down), scale to target height
-function fitIcon(parts,targetH,pos){
-  const tmp=new THREE.Group();
-  const meshes=parts.map(p=>new THREE.Mesh(p.geo, p.glyph?glyphMat:iconMat));
-  meshes.forEach(m=>tmp.add(m));
-  const bb=new THREE.Box3().setFromObject(tmp), c=new THREE.Vector3(), sz=new THREE.Vector3();
-  bb.getCenter(c); bb.getSize(sz);
-  const s=targetH/Math.max(sz.x,sz.y);
-  const local=new THREE.Matrix4().makeScale(s,-s,s)
-    .multiply(new THREE.Matrix4().makeTranslation(-c.x,-c.y,-c.z));
-  const grp=new THREE.Group();
-  meshes.forEach(m=>{ m.applyMatrix4(local); m.updateMatrix(); grp.add(m); });
-  grp.position.copy(pos);
-  const world=new THREE.Matrix4().makeTranslation(pos.x,pos.y,pos.z).multiply(local);
-  return {group:grp, items:parts.map(p=>({geo:p.geo,matrix:world}))};
-}
-
-const ORB_Y=-0.30, ORB_X=1.16, ORB_H=1.02;
-const waIcon=fitIcon(buildWA(),ORB_H,new THREE.Vector3( ORB_X,ORB_Y,0));
-const igIcon=fitIcon(buildIG(),ORB_H,new THREE.Vector3(-ORB_X,ORB_Y,0));
-const WA_URL="https://chat.whatsapp.com/JPlYEQ2D0dxEZKJDwsSC8v?s=cl&p=i&mlu=0";
-const IG_URL="https://www.instagram.com/bagalil2025?igsh=Y3pkOHZ5OWhuMDVy&utm_source=qr";
-const iconsGroup=new THREE.Group();
-iconsGroup.add(waIcon.group); iconsGroup.add(igIcon.group);
-iconsGroup.visible=false; root.add(iconsGroup);
-
-// particle target = the icon surfaces themselves
-const S_ORBS = sampleSurfaces([...waIcon.items, ...igIcon.items], N);
-
-// ---- mirrored reflections under the icons (matches the logo's premium treatment) ----
-const iconReflMat=iconMat.clone(); iconReflMat.transparent=true; iconReflMat.opacity=0; iconReflMat.depthWrite=false;
-const ICON_BASE_Y = ORB_Y - ORB_H*0.54;
-function mirrorOf(src){
-  const g=src.clone(true);
-  g.traverse(o=>{ if(o.isMesh) o.material=iconReflMat; });
-  iconsGroup.add(g);
-  return g;
-}
-const waRefl=mirrorOf(waIcon.group), igRefl=mirrorOf(igIcon.group);
-function syncIconReflections(){
-  [[waIcon.group,waRefl],[igIcon.group,igRefl]].forEach(([src,m])=>{
-    m.position.set(src.position.x, 2*ICON_BASE_Y - src.position.y, src.position.z);
-    m.scale.set(src.scale.x, -src.scale.y, src.scale.z);
-    m.rotation.set(-src.rotation.x, src.rotation.y, -src.rotation.z);
-  });
-}
-
-// ---- ambient dust: slow drifting motes for atmosphere (always on) ----
-const DUST=130;  // subtle ambient pink dust drifting over the hero photo (was 220 over the generative bg)
-const dGeo=new THREE.BufferGeometry();
-const dPos=new Float32Array(DUST*3);
-const dState=[];
-for(let i=0;i<DUST;i++){
-  dState.push({x:(Math.random()-0.5)*11,y:(Math.random()-0.5)*6,z:(Math.random()-0.5)*7-1.2,
-               sp:0.02+Math.random()*0.05, ph:Math.random()*Math.PI*2, am:0.15+Math.random()*0.4});
-  dPos[i*3]=dState[i].x; dPos[i*3+1]=dState[i].y; dPos[i*3+2]=dState[i].z;
-}
-dGeo.setAttribute('position',new THREE.BufferAttribute(dPos,3));
-const softSprite=(()=>{const s=32,cv=document.createElement('canvas');cv.width=cv.height=s;const x=cv.getContext('2d');
-  const g=x.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
-  g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(1,'rgba(255,255,255,0)');
-  x.fillStyle=g;x.fillRect(0,0,s,s);return new THREE.CanvasTexture(cv);})();
-const dust=new THREE.Points(dGeo,new THREE.PointsMaterial({size:0.03,map:softSprite,color:0xE5489F,
-  transparent:true,opacity:0.22,depthWrite:false,blending:THREE.NormalBlending}));
-root.add(dust);
-function updateDust(t){
-  const p=dGeo.attributes.position.array;
-  for(let i=0;i<DUST;i++){ const s=dState[i];
-    p[i*3]   = s.x + Math.sin(t*s.sp*2.0+s.ph)*s.am;
-    p[i*3+1] = s.y + Math.cos(t*s.sp*1.6+s.ph)*s.am*0.8 + Math.sin(t*0.05)*0.1;
-    p[i*3+2] = s.z + Math.sin(t*s.sp*1.2+s.ph*1.7)*s.am*0.5;
-  }
-  dGeo.attributes.position.needsUpdate=true;
-}
-
-// ---- autonomous fireflies: drift around each icon and get absorbed (no pointer needed) ----
-const FF=160;
-const ffGeo=new THREE.BufferGeometry();
-const ffPos=new Float32Array(FF*3);
-ffGeo.setAttribute('position',new THREE.BufferAttribute(ffPos,3));
-const ffMat=new THREE.PointsMaterial({size:0.045,map:softSprite,color:0xE5489F,transparent:true,
-  opacity:0,depthWrite:false,blending:THREE.NormalBlending});
-const fireflies=new THREE.Points(ffGeo,ffMat); fireflies.visible=false; root.add(fireflies);
-const ffState=[];
-for(let i=0;i<FF;i++){
-  ffState.push({ side: i<FF/2 ? 1 : -1, ang: Math.random()*Math.PI*2, tilt:(Math.random()-0.5)*0.9,
-    r0: 0.75+Math.random()*0.55, spd: 0.35+Math.random()*0.5,
-    life: Math.random(), dur: 2.4+Math.random()*2.6 });
-}
-let burstWA=0, burstIG=0;
-function updateFireflies(dt,alpha){
-  ffMat.opacity=alpha*0.85; fireflies.visible=alpha>0.02;
-  if(alpha<=0.02) return;
-  const p=ffGeo.attributes.position.array;
-  for(let i=0;i<FF;i++){
-    const s=ffState[i];
-    s.life += dt/s.dur;
-    if(s.life>=1){ s.life=0; s.ang=Math.random()*Math.PI*2; s.r0=0.75+Math.random()*0.55; }
-    const k=s.life;
-    const burst = s.side>0 ? burstWA : burstIG;
-    const r = s.r0*(1-k*k) + burst*0.9;
-    const a = s.ang + k*s.spd*3.0;
-    const cx = s.side>0 ? ORB_X : -ORB_X;
-    p[i*3]   = cx + Math.cos(a)*r;
-    p[i*3+1] = ORB_Y + Math.sin(a)*r*0.72 + s.tilt*r*0.35;
-    p[i*3+2] = Math.sin(a*1.3)*r*0.35;
-  }
-  ffGeo.attributes.position.needsUpdate=true;
-  burstWA*=0.92; burstIG*=0.92;
-}
-
-// ---- hover / click affordance on the 3D icons ----
-const ray=new THREE.Raycaster(), ptr=new THREE.Vector2();
-let hovered=null, hoverWA=0, hoverIG=0, iconsLive=false;
-function pickAt(cx,cy){
-  if(!iconsLive) return null;
-  ptr.x=(cx/innerWidth)*2-1; ptr.y=-(cy/innerHeight)*2+1;
-  ray.setFromCamera(ptr,camera);
-  if(ray.intersectObject(waIcon.group,true).length) return 'wa';
-  if(ray.intersectObject(igIcon.group,true).length) return 'ig';
-  return null;
-}
-addEventListener('pointermove',e=>{
-  hovered=pickAt(e.clientX,e.clientY);
-  document.body.style.cursor = hovered ? 'pointer' : '';
-});
-function track(evt,extra){
-  try{
-    if(typeof gtag==='function') gtag('event',evt,extra||{});
-    if(typeof fbq==='function') fbq('trackCustom',evt,extra||{});
-    if(window.dataLayer) window.dataLayer.push(Object.assign({event:evt},extra||{}));
-  }catch(e){}
-  console.log('[BAGLIL] track:',evt,extra||'');
-}
-function rewardTap(hit){
-  if(hit==='wa') burstWA=0.55; else if(hit==='ig') burstIG=0.55;
-  if(navigator.vibrate) try{navigator.vibrate(18);}catch(_){}
-}
-addEventListener('pointerdown',e=>{ const h=pickAt(e.clientX,e.clientY); if(h) rewardTap(h); });
-addEventListener('click',e=>{
-  const hit=pickAt(e.clientX,e.clientY);
-  if(hit==='wa'){ track('cta_click',{channel:'whatsapp',surface:'icon'}); window.open(WA_URL,'_blank'); }
-  if(hit==='ig'){ track('cta_click',{channel:'instagram',surface:'icon'}); window.open(IG_URL,'_blank'); }
-});
-
-// off-screen shell the particles fly in from
-const S_SCATTER=new Float32Array(N*3);
-for(let i=0;i<N;i++){ const th=Math.random()*Math.PI*2, ph=Math.acos(2*Math.random()-1);
-  const r=4.2+Math.random()*3.4;
-  S_SCATTER[i*3]=r*Math.sin(ph)*Math.cos(th);
-  S_SCATTER[i*3+1]=r*Math.cos(ph)*0.75;
-  S_SCATTER[i*3+2]=r*Math.sin(ph)*Math.sin(th)*0.6; }
-const turb=new Float32Array(N*3); for(let i=0;i<N*3;i++) turb[i]=Math.random()*2-1;
-
-// ---------- particle mesh ----------
-const pGeo=new THREE.BufferGeometry();
-const pPos=new Float32Array(N*3); pPos.set(S_LOGO);
-pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
-const pCol=new Float32Array(N*3); const base=new THREE.Color(0xE5489F);
-for(let i=0;i<N;i++){ const l=0.82+Math.random()*0.2;
-  pCol[i*3]=Math.min(1,base.r*l+(1-l)*0.25); pCol[i*3+1]=base.g*l; pCol[i*3+2]=Math.min(1,base.b*l+(1-l)*0.2); }
-pGeo.setAttribute('color',new THREE.BufferAttribute(pCol,3));
-const sprite=(()=>{const s=64,cv=document.createElement('canvas');cv.width=cv.height=s;const x=cv.getContext('2d');
-  const g=x.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
-  g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.45,'rgba(255,255,255,.92)');g.addColorStop(1,'rgba(255,255,255,0)');
-  x.fillStyle=g;x.fillRect(0,0,s,s);return new THREE.CanvasTexture(cv);})();
-const pMat=new THREE.PointsMaterial({size:0.030,map:sprite,vertexColors:true,transparent:true,
-  depthWrite:false,opacity:0,blending:THREE.NormalBlending});
-const points=new THREE.Points(pGeo,pMat); root.add(points);
-
-let rootScale=1;
-// post-processing handles (assigned async below; declared here so resize() can see them)
-let composer=null, fxPass=null;
-function resize(){
-  renderer.setSize(innerWidth,innerHeight);
-  if(composer) composer.setSize(innerWidth,innerHeight);
-  const aspect=innerWidth/innerHeight;
-  camera.aspect=aspect; camera.updateProjectionMatrix();
-  // visible size at the camera distance
-  const d=CAM_BASE;
-  const visH=2*d*Math.tan((40*Math.PI/180)/2);
-  const visW=visH*aspect;
-  // widest thing in the scene: the two icons side by side
-  const contentW=2*(ORB_X+ORB_H*0.5);
-  const contentH=2.9;
-  rootScale=Math.min(1, (visW*0.90)/contentW, (visH*0.88)/contentH);
-  root.scale.setScalar(rootScale);
-  // on tall screens nudge the composition up so the labels have room
-  root.position.y = aspect<0.85 ? 0.22 : 0;
-}
-addEventListener('resize',resize); resize();
-
-// ---------- post-processing: bloom + film grade / grain / chromatic aberration ----------
-// Loaded via dynamic import inside try/catch: if any addon fails, composer stays null and the
-// loop falls back to plain renderer.render — the page never blanks (protects the load KPI).
-// Kill-switch: append ?nofx to the URL to disable all post-fx for debugging.
-// Post-fx is OPT-IN now (?fx). The EffectComposer chain (UnrealBloomPass + the alpha=1 grade
-// pass) renders the canvas OPAQUE, which would hide the hero photo behind the transparent canvas.
-// The cinematic look (film grain + vignette) is delivered as DOM overlays over the photo instead.
-// Keep the code for a future alpha-preserving selective-bloom pass on the pink elements only.
-const FX_ON = /[?&]fx\b/.test(location.search);
-const FX_MOBILE = Math.min(innerWidth,innerHeight) < 700 || /Mobi|Android/i.test(navigator.userAgent);
-const FilmGradeShader = {
-  uniforms:{
-    tDiffuse:{value:null}, uTime:{value:0},
-    uCA:{value:FX_MOBILE?0.0011:0.0016},   // chromatic aberration (subtle, edge-weighted)
-    uGrain:{value:REDUCED?0.028:0.05},     // film grain strength
-    uVignette:{value:0.26}, uContrast:{value:1.045}, uSat:{value:1.05}, uWarm:{value:0.018}
-  },
-  vertexShader:'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
-  fragmentShader:[
-    'varying vec2 vUv;',
-    'uniform sampler2D tDiffuse;',
-    'uniform float uTime,uCA,uGrain,uVignette,uContrast,uSat,uWarm;',
-    'float hash(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }',
-    'void main(){',
-    '  vec2 uv=vUv; vec2 dir=uv-0.5; float d=dot(dir,dir);',
-    '  vec2 off=dir*d*uCA*8.0;',              // radial CA, stronger toward the edges
-    '  vec3 col;',
-    '  col.r=texture2D(tDiffuse,uv+off).r;',
-    '  col.g=texture2D(tDiffuse,uv).g;',
-    '  col.b=texture2D(tDiffuse,uv-off).b;',
-    '  col=(col-0.5)*uContrast+0.5;',          // gentle S-contrast
-    '  float l=dot(col,vec3(0.299,0.587,0.114));',
-    '  col=mix(vec3(l),col,uSat);',            // mild saturation
-    '  col+=vec3(uWarm,uWarm*0.4,-uWarm*0.5)*smoothstep(0.5,1.0,l);', // warm highlights only
-    '  float g=hash(uv*vec2(1920.0,1080.0)+fract(uTime));',
-    '  col+=(g-0.5)*uGrain;',                  // film grain
-    '  float vig=smoothstep(0.9,0.2,d*2.2);',
-    '  col*=mix(1.0,vig,uVignette);',          // subtle vignette
-    '  gl_FragColor=vec4(clamp(col,0.0,1.0),1.0);',
-    '}'
-  ].join('\n')
-};
-(async()=>{
-  if(!FX_ON){ console.log('[BAGLIL] WebGL post-fx off (opt-in via ?fx); DOM grain+vignette handle the film look'); return; }
-  try{
-    const [{EffectComposer},{RenderPass},{UnrealBloomPass},{ShaderPass},{OutputPass}] = await Promise.all([
-      import('three/addons/postprocessing/EffectComposer.js'),
-      import('three/addons/postprocessing/RenderPass.js'),
-      import('three/addons/postprocessing/UnrealBloomPass.js'),
-      import('three/addons/postprocessing/ShaderPass.js'),
-      import('three/addons/postprocessing/OutputPass.js'),
-    ]);
-    const comp=new EffectComposer(renderer);
-    comp.setPixelRatio(FX_MOBILE?Math.min(devicePixelRatio,1.5):Math.min(devicePixelRatio,2)); // bloom cost scales with pixels; favor FPS on mobile
-    comp.setSize(innerWidth,innerHeight);
-    comp.addPass(new RenderPass(scene,camera));
-    // bloom runs in linear HDR before tone mapping. The golden-hour sky sits ~0.62-0.70 luminance,
-    // so threshold is kept ABOVE it (0.82) — only the additive glints, sun glow and specular
-    // highlights bloom, the sky itself does not wash out. Conservative strength; easy to push later.
-    const strength=FX_MOBILE?0.42:0.6, radius=0.55, threshold=0.82;
-    comp.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),strength,radius,threshold));
-    comp.addPass(new OutputPass());           // tone map + sRGB, BEFORE the film grade
-    const grade=new ShaderPass(FilmGradeShader);
-    comp.addPass(grade);                       // last pass -> renders to screen
-    composer=comp; fxPass=grade;
-    composer.setSize(innerWidth,innerHeight);
-    console.log('[BAGLIL] post-fx ready (bloom + film grade)'+(FX_MOBILE?' [mobile-lite]':''));
-  }catch(e){
-    console.warn('[BAGLIL] post-fx unavailable — falling back to plain render:',e);
-    composer=null; fxPass=null;
-  }
-})();
-
-// present the frame: composed when post-fx is ready, otherwise plain (never blanks)
-function present(){ if(composer){ composer.render(); } else { renderer.render(scene,camera); } }
-
-// ---------- interaction ----------
-let tx=0,ty=0,px=0,py=0,drag=false,lx=0,manual=0;
-addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;});
-addEventListener('pointerup',()=>drag=false);
-addEventListener('pointermove',e=>{ if(drag){manual+=(e.clientX-lx)*0.008;lx=e.clientX;}
-  tx=e.clientX/innerWidth-.5; ty=e.clientY/innerHeight-.5; });
-addEventListener('deviceorientation',e=>{ if(e.gamma!=null){
-  tx=Math.max(-1,Math.min(1,e.gamma/45)); ty=Math.max(-1,Math.min(1,(e.beta-45)/45)); }});
-
-// ---------- timeline ----------
-// logo(4.0) -> dissolve(1.2) -> morph to orbs(1.5) -> orbs(2.5) -> morph back(1.5) -> reform(1.0)
-// scroll-driven segments: [name, from, to] over progress 0..1
-const SEG=[
-  ['logo',     0.00, 0.28],
-  ['dissolve', 0.28, 0.54],
-  ['toOrbs',   0.54, 0.80],
-  ['crystal',  0.80, 0.92],
-  ['settle',   0.92, 1.01],
-];
-// --- scroll progress with smoothing, plus an idle auto-reveal so non-scrollers still see the CTA ---
-const spacer=document.getElementById('spacer');
-const SCROLL_SCREENS=2.5;
-function sizeSpacer(){ spacer.style.height=Math.round(innerHeight*SCROLL_SCREENS)+'px'; }
-sizeSpacer(); addEventListener('resize',sizeSpacer);
-let prog=0, targetProg=0, userScrolled=false, lastInput=performance.now(), autoProg=0;
-function readScroll(){
-  const max=Math.max(1, document.documentElement.scrollHeight-innerHeight);
-  targetProg=Math.min(1, Math.max(0, scrollY/max));
-  if(scrollY>2){ userScrolled=true; lastInput=performance.now(); }
-}
-addEventListener('scroll',readScroll,{passive:true});
-readScroll();
-
-const ease=t=>t*t*(3-2*t);
-const tagEl=document.getElementById('tag');
-const lblWA=document.getElementById('orbWA'), lblIG=document.getElementById('orbIG');
-const ripWA=document.getElementById('ripWA'), ripIG=document.getElementById('ripIG');
-lblWA.addEventListener('click',()=>track('cta_click',{channel:'whatsapp',surface:'badge'}));
-lblIG.addEventListener('click',()=>track('cta_click',{channel:'instagram',surface:'badge'}));
-const v3=new THREE.Vector3();
-const t0=performance.now();
-let tagSwapped=false, flashed=false, booted=false, copyTimer=0;
-const flashEl=document.getElementById('flash');
-const cueEl=document.getElementById('cue');
-const subEl=document.getElementById('sub');
-setTimeout(()=>{tagEl.classList.add('show');subEl.classList.add('show');},350);
-
-let _prevT=0;
-function frame(){
-  const time=(performance.now()-t0)/1000;
-  const dt=Math.min(0.05,time-_prevT); _prevT=time;
-
-  // ---- resolve progress: scroll drives it; if nobody ever scrolls, reveal the CTA anyway ----
-  if(!userScrolled && (performance.now()-lastInput)>6000){
-    autoProg=Math.min(1, autoProg + dt*0.22);          // ~4.5s to walk the whole sequence
-  }
-  const wanted=Math.max(targetProg, userScrolled?0:autoProg);
-  prog += (wanted-prog)*0.09;                           // smoothing — raw scroll is jittery
-  const P=Math.min(1,Math.max(0,prog));
-
-  let name='settle', f=1;
-  for(const s of SEG){ if(P<s[2]){ name=s[0]; f=Math.min(1,Math.max(0,(P-s[1])/(s[2]-s[1]))); break; } }
-
-  // scroll cue fades out as soon as the journey starts
-  cueEl.classList.toggle('hide', P>0.04);
-
-  // ---- solid logo opacity vs particle opacity ----
-  let logoOp=0, partOp=0, iconOp=0, mt=0, A=S_LOGO, B=S_LOGO, turbAmp=0;
-  if(name==='logo'){ logoOp=1; }                              // logo is simply there from the first pixel
-  else if(name==='dissolve'){ logoOp=1-ease(f); partOp=ease(f); turbAmp=ease(f)*0.30; }
-  else if(name==='toOrbs'){ partOp=1; A=S_LOGO; B=S_ORBS; mt=ease(f); turbAmp=Math.sin(Math.PI*f)*0.24; }
-  else if(name==='crystal'){ A=S_ORBS; B=S_ORBS; partOp=1-ease(f); iconOp=ease(f); }
-  else { A=S_ORBS; B=S_ORBS; partOp=0; iconOp=1; }   // settle
-
-  const logoLive=(name==='logo'||name==='dissolve');
-  pink.opacity=logoOp; wrap.visible=logoLive && logoOp>0.01;
-  reflMat.opacity=0.16*logoOp; reflWrap.visible=logoLive && logoOp>0.01;
-  pMat.opacity=partOp; points.visible=partOp>0.01;
-  iconMat.opacity=iconOp; glyphMat.opacity=iconOp; iconsGroup.visible=iconOp>0.01;
-  iconReflMat.opacity=iconOp*0.075;
-  iconsLive = (name==='settle' && iconOp>0.9);
-  updateFireflies(dt, iconOp);
-  // gentle "tap me" pulse + hover lift
-  const pulse=1+Math.sin(time*1.9)*0.035;
-  hoverWA += (((hovered==='wa')?1:0)-hoverWA)*0.15;
-  hoverIG += (((hovered==='ig')?1:0)-hoverIG)*0.15;
-  waIcon.group.scale.setScalar(pulse*(1+hoverWA*0.14));
-  igIcon.group.scale.setScalar(pulse*(1+hoverIG*0.14));
-  lblWA.classList.toggle('hot',hoverWA>0.5);
-  lblIG.classList.toggle('hot',hoverIG>0.5);
-  // headline set follows scroll in BOTH directions
-  const wantEnd = P>0.86;
-  if(wantEnd!==tagSwapped){
-    tagSwapped=wantEnd;
-    document.getElementById('ui').classList.toggle('low',wantEnd);
-    tagEl.classList.remove('show'); subEl.classList.remove('show');
-    clearTimeout(copyTimer);
-    copyTimer=setTimeout(()=>{
-      tagEl.textContent = wantEnd ? 'אל תפספסו את האירוע הבא' : 'האירועים הכי שווים בגליל';
-      subEl.textContent = wantEnd ? 'בחרו איך להצטרף'        : 'יין | מוזיקה | חופש';
-      tagEl.classList.add('show'); subEl.classList.add('show');
-    },420);
-  }
-
-  // ---- particle positions ----
-  if(partOp>0.01){
-    const p=pGeo.attributes.position.array;
-    for(let k=0;k<N;k++){ const j=k*3;
-      let x=A[j]+(B[j]-A[j])*mt, y=A[j+1]+(B[j+1]-A[j+1])*mt, z=A[j+2]+(B[j+2]-A[j+2])*mt;
-      if(turbAmp){ x+=turb[j]*turbAmp; y+=turb[j+1]*turbAmp; z+=turb[j+2]*turbAmp; }
-      p[j]=x; p[j+1]=y; p[j+2]=z;
-    }
-    pGeo.attributes.position.needsUpdate=true;
-  }
-
-  // ---- motion ----
-  px+=(tx-px)*0.06; py+=(ty-py)*0.06;
-
-  // (2) slow cinematic camera push over the first ~9s
-  const pushT=REDUCED?1:P;
-  camera.position.z = CAM_BASE + 0.95*(1-pushT*pushT*(3-2*pushT));
-  camera.position.x = px*0.4; camera.position.y = 0.25 - py*0.3;
-  camera.lookAt(0,root.position.y*0.5,0);
-
-  // ---- background layers removed; the hero photo carries the scene, ambient dust drifts over it ----
-
-  // (3) light sweep across the logo right after it solidifies
-  if(name==='logo'){
-    const s=Math.max(0,Math.min(1,f*1.25));
-    sweep.position.set(-4.2+8.4*s, 1.1, 2.4);
-    sweep.intensity = Math.sin(Math.PI*s)*22;
-  } else { sweep.intensity*=0.85; }
-
-  // (4) peak: white flash + outward burst the instant the logo breaks apart
-  if(P<0.20) flashed=false;
-  if(name==='dissolve' && !flashed){ flashed=true;
-    flashEl.style.opacity='0.85';
-    setTimeout(()=>{ flashEl.style.transition='opacity .55s ease'; flashEl.style.opacity='0'; },90);
-  }
-
-  // (6) ambient dust
-  updateDust(time);
-
-  const ry=(REDUCED?0:Math.sin(time*0.4)*0.45) + px*0.7 + manual;
-  const rx=-0.05 + Math.sin(time*0.3)*0.05 - py*0.25;
-  wrap.rotation.y=ry; wrap.rotation.x=rx;
-  reflWrap.rotation.y=ry; reflWrap.rotation.x=-rx;
-  points.rotation.y = (name==='settle'||name==='crystal') ? Math.sin(time*0.25)*0.10 + px*0.25 : ry*0.35;
-  iconsGroup.rotation.y = Math.sin(time*0.32)*0.30 + px*0.45;
-  iconsGroup.rotation.x = -0.10 + Math.sin(time*0.24)*0.06 - py*0.18;
-  syncIconReflections();
-
-  // drive film grain (frozen under reduced-motion so it doesn't shimmer)
-  if(fxPass) fxPass.uniforms.uTime.value = REDUCED ? 0 : time;
-  present();
-
-  // ---- project icon centers -> position the clickable labels (guarded: must never block render) ----
-  try{
-    if(name==='crystal'||name==='settle'){
-      const showLbl=(iconOp>0.5);
-      lblWA.classList.toggle('on',showLbl);
-      lblIG.classList.toggle('on',showLbl);
-      ripWA.classList.toggle('on',showLbl);
-      ripIG.classList.toggle('on',showLbl);
-      const toScreen=(wx,wy)=>{
-        v3.set(wx*rootScale, wy*rootScale+root.position.y, 0).project(camera);
-        return [(v3.x*0.5+0.5)*innerWidth, (-v3.y*0.5+0.5)*innerHeight];
-      };
-      // ripple size follows the on-screen size of an icon
-      const [cxA,cyA]=toScreen(ORB_X,ORB_Y);
-      const [cxB,cyB]=toScreen(ORB_X+ORB_H*0.5,ORB_Y);
-      const RIP_MAX=1.42;                       // must match the max scale in @keyframes rip
-      const ringPx=Math.max(70,Math.abs(cxB-cxA)*1.95);
-      [[ripWA,ORB_X],[ripIG,-ORB_X]].forEach(([el,x])=>{
-        const [sx,sy]=toScreen(x,ORB_Y);
-        // never let the largest ring cross the viewport edge
-        const room=Math.min(sx,innerWidth-sx)-6;
-        const fit=Math.max(56,(room*2)/RIP_MAX);
-        el.style.left=sx+'px'; el.style.top=sy+'px';
-        el.style.setProperty('--rs',Math.min(ringPx,fit)+'px');
+  // Carousel: dots ↔ scroll sync, dim non-active slides
+  const track_el = document.querySelector('.carousel-track');
+  const dots = document.querySelectorAll('.dot');
+  if (track_el && dots.length) {
+    const slides = [...track_el.querySelectorAll('.slide')];
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        slides[i]?.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
       });
-      // badges: centred just above each icon, clamped so they never clip off-screen
-      [[lblWA,ORB_X],[lblIG,-ORB_X]].forEach(([el,x])=>{
-        const [sx,sy]=toScreen(x,ORB_Y+ORB_H*0.62);
-        const halfW=(el.offsetWidth||90)/2, pad=8;
-        el.style.left=Math.min(innerWidth-halfW-pad,Math.max(halfW+pad,sx))+'px';
-        el.style.top=sy+'px';
+    });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+          const idx = slides.indexOf(entry.target);
+          if (idx >= 0){
+            slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+          }
+        }
       });
-    }else{ lblWA.classList.remove('on'); lblIG.classList.remove('on');
-           ripWA.classList.remove('on'); ripIG.classList.remove('on'); }
-  }catch(err){ if(!window.__lblErr){console.warn('[BAGLIL] label projection error',err);window.__lblErr=1;} }
-
-  if(!booted){ booted=true;
-    const b=document.getElementById('boot');
-    if(b) requestAnimationFrame(()=>b.classList.add('gone'));
+    }, { root: track_el, threshold: [0.6, 0.85] });
+    slides.forEach(slide => observer.observe(slide));
   }
-  requestAnimationFrame(frame);
-}
-frame();
 </script>
+
 </body>
 </html>

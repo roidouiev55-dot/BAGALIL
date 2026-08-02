@@ -381,14 +381,6 @@
     odem     : ''
   };
 
-  document.querySelectorAll('[data-ticket]').forEach(a=>{
-    const url = TICKETS[a.dataset.ticket];
-    if(url){
-      a.href=url; a.target='_blank'; a.rel='noopener';
-      a.classList.remove('is-locked'); a.removeAttribute('aria-disabled');
-    }
-  });
-
   function track(evt,data){
     try{
       if(typeof gtag==='function') gtag('event',evt,data||{});
@@ -402,11 +394,25 @@
   document.querySelector('.btn-wa')?.addEventListener('click',()=>track('community_click',{channel:'whatsapp'}));
   document.querySelector('.btn-ig')?.addEventListener('click',()=>track('community_click',{channel:'instagram'}));
 
+  /* ---------- carousel ---------- */
   const carousel=document.getElementById('carousel');
   const slides=carousel?[...carousel.querySelectorAll('.slide')]:[];
   const dots=[...document.querySelectorAll('.dot')];
-  const goTo=i=>slides[i]?.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
-  dots.forEach((d,i)=>d.addEventListener('click',()=>goTo(i)));
+
+  function goToSlide(i,instant){
+    const el=slides[i];
+    if(!el||!carousel) return;
+    if(carousel.scrollWidth<=carousel.clientWidth+4) return;   // desktop grid, nothing to scroll
+    const y=window.scrollY;
+    el.scrollIntoView({behavior:instant?'auto':'smooth',inline:'center',block:'nearest'});
+    if(instant) window.scrollTo(0,y);                          // never jump the page vertically
+    slides.forEach((s,j)=>s.classList.toggle('is-active',j===i));
+    dots.forEach((d,j)=>d.classList.toggle('active',j===i));
+  }
+  window.goToSlide=goToSlide;
+
+  dots.forEach((d,i)=>d.addEventListener('click',()=>goToSlide(i)));
+
   if(carousel&&slides.length){
     const io=new IntersectionObserver(es=>es.forEach(en=>{
       if(en.isIntersecting&&en.intersectionRatio>.6){
@@ -419,6 +425,79 @@
     }),{root:carousel,threshold:[.6,.9]});
     slides.forEach(s=>io.observe(s));
   }
+
+  /* ===== ATTRIBUTION LAYER — start ===== */
+  (function () {
+    var EVENTS = ['recanati', 'redwhite', 'odem'];
+
+    var q = new URLSearchParams(location.search);
+    var e = (q.get('e') || '').toLowerCase();
+
+    var A = {
+      event:    EVENTS.indexOf(e) > -1 ? e : null,
+      source:   q.get('utm_source')   || '',
+      medium:   q.get('utm_medium')   || '',
+      campaign: q.get('utm_campaign') || '',
+      adgroup:  q.get('utm_content')  || '',
+      ad:       q.get('utm_term')     || '',
+      clickid:  q.get('ttclid') || q.get('fbclid') || ''
+    };
+
+    try {
+      if (A.source || A.event) {
+        sessionStorage.setItem('bg_attr', JSON.stringify(A));
+      } else {
+        var saved = sessionStorage.getItem('bg_attr');
+        if (saved) A = JSON.parse(saved);
+      }
+    } catch (err) {}
+
+    window.BG_ATTR = A;
+
+    /* (א) פתיחת הקרוסלה על השקופית הנכונה */
+    if (A.event) {
+      var idx = EVENTS.indexOf(A.event);
+      if (typeof window.goToSlide === 'function') window.goToSlide(idx, true);
+    }
+
+    /* (ב) העשרת כל אירוע track() במקור */
+    var _track = window.track;
+    window.track = function (name, params) {
+      params = params || {};
+      params.lp_event    = A.event    || 'none';
+      params.lp_source   = A.source   || 'direct';
+      params.lp_campaign = A.campaign || '';
+      params.lp_adgroup  = A.adgroup  || '';
+      params.lp_ad       = A.ad       || '';
+      if (typeof _track === 'function') return _track(name, params);
+    };
+
+    /* (ג) העברת ה-UTM הלאה ללינק זיגו */
+    window.decorateTicketUrl = function (url) {
+      if (!url) return url;
+      var u;
+      try { u = new URL(url, location.href); } catch (err) { return url; }
+      if (A.source)   u.searchParams.set('utm_source',   A.source);
+      if (A.medium)   u.searchParams.set('utm_medium',   A.medium);
+      if (A.campaign) u.searchParams.set('utm_campaign', A.campaign);
+      if (A.adgroup)  u.searchParams.set('utm_content',  A.adgroup);
+      if (A.ad)       u.searchParams.set('utm_term',     A.ad);
+      return u.toString();
+    };
+
+    /* (ד) אירוע כניסה, כמכנה לחישוב אחוז המרה */
+    window.track('lp_view', {});
+  })();
+  /* ===== ATTRIBUTION LAYER — end ===== */
+
+  /* ---------- ticket buttons: built AFTER the attribution layer ---------- */
+  document.querySelectorAll('[data-ticket]').forEach(a=>{
+    var url = TICKETS[a.dataset.ticket];
+    if(!url) return;                                  // stays is-locked
+    a.href = window.decorateTicketUrl ? window.decorateTicketUrl(url) : url;
+    a.target='_blank'; a.rel='noopener';
+    a.classList.remove('is-locked'); a.removeAttribute('aria-disabled');
+  });
 </script>
 
 </body>

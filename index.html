@@ -383,6 +383,7 @@
 
   function track(evt,data){
     try{
+      if(typeof ttq!=='undefined'&&ttq.track) ttq.track(evt,data||{});
       if(typeof gtag==='function') gtag('event',evt,data||{});
       if(typeof fbq==='function') fbq('trackCustom',evt,data||{});
       if(window.dataLayer) window.dataLayer.push(Object.assign({event:evt},data||{}));

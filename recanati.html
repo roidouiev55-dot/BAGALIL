@@ -67,7 +67,7 @@
   .hero-inner{
     position:relative;z-index:5;width:100%;max-width:660px;
     margin-inline:auto;
-    padding:calc(1.4rem + env(safe-area-inset-top)) 1.35rem 0;
+    padding:calc(2.5rem + env(safe-area-inset-top)) 1.35rem 0;
   }
   .rail{position:relative;z-index:5;width:100%;padding-bottom:1.5rem}
   .hero-logo{height:58px;width:auto;margin-bottom:1.5rem}
@@ -110,6 +110,12 @@
     transition:background .2s ease,transform .15s ease;
   }
   .cta:hover{background:var(--pink-btn-hover)}
+  .cta.is-locked{
+    background:rgba(255,255,255,.14);color:rgba(255,255,255,.45);
+    pointer-events:none;cursor:default;
+  }
+  .detail .cta.is-locked{background:rgba(17,17,17,.08);color:rgba(17,17,17,.35)}
+  .cta.is-locked .arrow{display:none}
   .cta:active{transform:scale(.99)}
   .cta .arrow{font-weight:700;transition:transform .25s ease}
   .cta:hover .arrow{transform:translateX(-4px)}
@@ -286,7 +292,7 @@
     <h1>פסטיבל היין</h1>
     <span class="eyebrow">יקב רקנאטי</span>
     <p class="hero-lead">מסלול טעימות יין חופשי, מוזיקה ונוף גלילי. שישי צהריים במתחם ממוזג.</p>
-    <a href="#" class="cta" data-ticket data-event="recanati-hero">
+    <a class="cta is-locked" data-ticket data-event="recanati-hero" aria-disabled="true">
       <span>לרכישת כרטיסים · מ־₪155</span><span class="arrow" aria-hidden="true">←</span>
     </a>
     <span class="cta-note">רכישה מאובטחת דרך Zigo</span>
@@ -311,7 +317,7 @@
         <div class="price">₪155</div>
       </div>
     </div>
-    <a href="#" class="cta" data-ticket data-event="recanati-detail">
+    <a class="cta is-locked" data-ticket data-event="recanati-detail" aria-disabled="true">
       <span>לרכישת כרטיסים</span><span class="arrow" aria-hidden="true">←</span>
     </a>
     <span class="cta-note">רכישה מאובטחת דרך Zigo</span>
@@ -322,7 +328,7 @@
 <section class="community">
   <div class="community-inner">
     <h2>לא לפספס אירוע</h2>
-    <p>מידע ראשוני, הצצות מאחורי הקלעים וכרטיסים במחיר מוקדם</p>
+    <p>עדכונים לפני כולם, וכרטיסים במחיר מוקדם.</p>
     <div class="proof">
       <span class="proof-dot" aria-hidden="true"></span>
       <span><strong>600+</strong> חברים כבר בפנים</span>
@@ -341,10 +347,13 @@
 
 <script>
   /* ====== הדבק כאן את לינק הזיגו של האירוע הזה ====== */
-  const TICKET_URL = '#';
+  const TICKET_URL = '';
 
   document.querySelectorAll('[data-ticket]').forEach(a=>{
-    if(TICKET_URL!=='#'){ a.href=TICKET_URL; a.target='_blank'; a.rel='noopener'; }
+    if(TICKET_URL){
+      a.href=TICKET_URL; a.target='_blank'; a.rel='noopener';
+      a.classList.remove('is-locked'); a.removeAttribute('aria-disabled');
+    }
   });
 
   function track(evt,data){

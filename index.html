@@ -67,7 +67,7 @@
   .hero-inner{
     position:relative;z-index:5;width:100%;max-width:660px;
     margin-inline:auto;
-    padding:calc(1.4rem + env(safe-area-inset-top)) 1.35rem 0;
+    padding:calc(2.5rem + env(safe-area-inset-top)) 1.35rem 0;
   }
   .rail{position:relative;z-index:5;width:100%;padding-bottom:1.5rem}
   .hero-logo{height:58px;width:auto;margin-bottom:1.5rem}
@@ -110,6 +110,12 @@
     transition:background .2s ease,transform .15s ease;
   }
   .cta:hover{background:var(--pink-btn-hover)}
+  .cta.is-locked{
+    background:rgba(255,255,255,.14);color:rgba(255,255,255,.45);
+    pointer-events:none;cursor:default;
+  }
+  .detail .cta.is-locked{background:rgba(17,17,17,.08);color:rgba(17,17,17,.35)}
+  .cta.is-locked .arrow{display:none}
   .cta:active{transform:scale(.99)}
   .cta .arrow{font-weight:700;transition:transform .25s ease}
   .cta:hover .arrow{transform:translateX(-4px)}
@@ -289,56 +295,50 @@
   <div class="rail">
     <div class="carousel" id="carousel">
         <article class="slide is-active" id="ev-recanati">
-          <a href="/recanati">
-            <img class="slide-poster" src="recanati.webp" alt="פסטיבל היין · יקב רקנאטי · שישי 14.08"
-                 width="1080" height="1080" loading="eager" decoding="async" fetchpriority="high">
-          </a>
+          <img class="slide-poster" src="recanati.webp" alt="פסטיבל היין · יקב רקנאטי · שישי 14.08"
+               width="1080" height="1080" loading="eager" decoding="async" fetchpriority="high">
           <div class="slide-body">
             <div class="slide-date">14.08</div>
             <div class="slide-name">פסטיבל היין · יקב רקנאטי</div>
             <div class="slide-where">יקב רקנאטי · מתחם ממוזג</div>
             <div class="slide-foot">
-              <span class="slide-price">₪155 <small>ומעלה</small></span>
+              <span class="slide-price"><small>החל מ־</small> ₪155</span>
               <span class="slide-price"><small>שישי · 12:00–16:30</small></span>
             </div>
-            <a href="/recanati" class="cta" data-event="recanati-index">
-              <span>לפרטים וכרטיסים</span><span class="arrow" aria-hidden="true">←</span>
+            <a class="cta is-locked" data-ticket="recanati" data-event="recanati-ticket" aria-disabled="true">
+              <span>לרכישת כרטיסים</span><span class="arrow" aria-hidden="true">←</span>
             </a>
           </div>
         </article>
         <article class="slide" id="ev-redwhite">
-          <a href="/redwhite">
-            <img class="slide-poster" src="redwhite.webp" alt="RED &amp; WHITE · רמת ישי · שבת 15.08"
-                 width="1080" height="1080" loading="lazy" decoding="async">
-          </a>
+          <img class="slide-poster" src="redwhite.webp" alt="RED &amp; WHITE · רמת ישי · שבת 15.08"
+               width="1080" height="1080" loading="lazy" decoding="async">
           <div class="slide-body">
             <div class="slide-date">15.08</div>
             <div class="slide-name">RED &amp; WHITE · רמת ישי</div>
             <div class="slide-where">חורש האלונים, רמת ישי · תחת כיפת השמיים</div>
             <div class="slide-foot">
-              <span class="slide-price">₪170 <small>ומעלה</small></span>
+              <span class="slide-price"><small>החל מ־</small> ₪170</span>
               <span class="slide-price"><small>שבת · שערים 17:30</small></span>
             </div>
-            <a href="/redwhite" class="cta" data-event="redwhite-index">
-              <span>לפרטים וכרטיסים</span><span class="arrow" aria-hidden="true">←</span>
+            <a class="cta is-locked" data-ticket="redwhite" data-event="redwhite-ticket" aria-disabled="true">
+              <span>לרכישת כרטיסים</span><span class="arrow" aria-hidden="true">←</span>
             </a>
           </div>
         </article>
         <article class="slide" id="ev-odem">
-          <a href="/odem">
-            <img class="slide-poster" src="odem.webp" alt="עומרי סמדר · יקב הר אודם · שישי 28.08"
-                 width="1080" height="1080" loading="lazy" decoding="async">
-          </a>
+          <img class="slide-poster" src="odem.webp" alt="עומרי סמדר · יקב הר אודם · שישי 28.08"
+               width="1080" height="1080" loading="lazy" decoding="async">
           <div class="slide-body">
             <div class="slide-date">28.08</div>
             <div class="slide-name">עומרי סמדר · יקב הר אודם</div>
             <div class="slide-where">יקב הר אודם, רמת הגולן · רחבה מוצלת</div>
             <div class="slide-foot">
-              <span class="slide-price">₪171 <small>ומעלה</small></span>
+              <span class="slide-price"><small>החל מ־</small> ₪171</span>
               <span class="slide-price"><small>שישי · 12:00–17:00</small></span>
             </div>
-            <a href="/odem" class="cta" data-event="odem-index">
-              <span>לפרטים וכרטיסים</span><span class="arrow" aria-hidden="true">←</span>
+            <a class="cta is-locked" data-ticket="odem" data-event="odem-ticket" aria-disabled="true">
+              <span>לרכישת כרטיסים</span><span class="arrow" aria-hidden="true">←</span>
             </a>
           </div>
         </article>
@@ -354,7 +354,7 @@
 <section class="community">
   <div class="community-inner">
     <h2>לא לפספס אירוע</h2>
-    <p>מידע ראשוני, הצצות מאחורי הקלעים וכרטיסים במחיר מוקדם</p>
+    <p>עדכונים לפני כולם, וכרטיסים במחיר מוקדם.</p>
     <div class="proof">
       <span class="proof-dot" aria-hidden="true"></span>
       <span><strong>600+</strong> חברים כבר בפנים</span>
@@ -372,6 +372,22 @@
 </footer>
 
 <script>
+  /* =========================================================
+     לינקי הזיגו. כל עוד ערך הוא '' הכפתור נעול ולא מוביל לשום מקום.
+     ========================================================= */
+  const TICKETS = {
+    recanati : '',
+    redwhite : '',
+    odem     : ''
+  };
+
+  document.querySelectorAll('[data-ticket]').forEach(a=>{
+    const url = TICKETS[a.dataset.ticket];
+    if(url){
+      a.href=url; a.target='_blank'; a.rel='noopener';
+      a.classList.remove('is-locked'); a.removeAttribute('aria-disabled');
+    }
+  });
 
   function track(evt,data){
     try{

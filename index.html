@@ -3,580 +3,419 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>BAGALIL · האירועים הקרובים בגליל</title>
-<meta name="description" content="פסטיבלי יין ומוזיקה בגליל. כרטיסים לאירועים הקרובים.">
+<title>BAGALIL · שלושה פסטיבלי יין באוגוסט</title>
+<meta name="description" content="פסטיבלי יין ומוזיקה בצפון. רקנאטי 14.08, RED &amp; WHITE 15.08, הר אודם 28.08. כרטיסים החל מ־₪155.">
 <meta name="theme-color" content="#12080a">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bagalil.vercel.app/">
+<meta property="og:title" content="BAGALIL · שלושה פסטיבלי יין באוגוסט">
+<meta property="og:description" content="רקנאטי 14.08 · RED &amp; WHITE 15.08 · הר אודם 28.08">
+<meta property="og:image" content="https://bagalil.vercel.app/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="he_IL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://bagalil.vercel.app/og-cover.jpg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="hero.webp" media="(max-width: 899px)">
+<link rel="preload" as="image" href="hero-wide.webp" media="(min-width: 900px)">
+
+<!-- Meta Pixel / GA4 snippets go here -->
 
 <style>
   :root{
-    /* Reduced palette — pink is now an accent, not the theme */
     --pink:#E5489F;
     --pink-dark:#C63285;
-    --pink-soft:rgba(229,72,159,.10);
     --cream:#FBF5EC;
-    --cream-warm:#F4EBD9;
-    --wine:#12080a;          /* deep wine-black for hero */
-    --wine-warm:#2b1620;     /* dark warm for community section */
+    --wine:#12080a;
+    --wine-warm:#2b1620;
     --ink:#141414;
-    --ink-soft:#3a3a3a;
     --muted:#6b6b6b;
-    --muted-dark:rgba(255,255,255,.55);
+    --line:rgba(20,20,20,.10);
+    --line-light:rgba(255,255,255,.16);
     --serif:'Frank Ruhl Libre', serif;
     --sans:'Heebo', sans-serif;
-    --shadow-md: 0 12px 40px rgba(20,20,20,.08);
-    --shadow-lg: 0 24px 60px rgba(20,20,20,.15);
-    --shadow-xl: 0 30px 80px rgba(20,20,20,.25);
+    --shadow-md:0 12px 40px rgba(20,20,20,.09);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
   body{
     font-family:var(--sans);
     background:var(--cream);
     color:var(--ink);
-    line-height:1.55;
+    line-height:1.6;
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     overflow-x:hidden;
   }
   a{color:inherit;text-decoration:none}
   img,video{display:block;max-width:100%}
+  :focus-visible{outline:2px solid var(--pink);outline-offset:3px;border-radius:6px}
 
-  /* ---- Header (cream) ---- */
-  header{
-    padding:1.15rem 1.5rem .3rem;
-    text-align:center;
-    position:relative;
-    z-index:5;
-    background:var(--cream);
-  }
-  .logo3d{
-    display:inline-block;
-    height:56px;
-    width:auto;
-    filter:drop-shadow(0 6px 12px rgba(229,72,159,.18));
-    animation:float 4s ease-in-out infinite;
-  }
-  @keyframes float{
-    0%,100%{transform:translateY(0)}
-    50%{transform:translateY(-3px)}
-  }
-
-  /* ---- Hero section (dark wine) ---- */
-  .hero-wrap{
-    background:var(--wine);
-    padding-bottom:0;
-  }
+  /* ==================== HERO ==================== */
   .hero{
     position:relative;
-    width:100%;
-    aspect-ratio:9/16;
-    max-height:72vh;
+    min-height:100vh;
+    min-height:94svh;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    background:linear-gradient(180deg, #093a7a 0%, #1f8bc7 62%, #22a0d7 100%);
     overflow:hidden;
-    background:var(--wine);
-    margin:.5rem auto 0;
   }
-  .hero video{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
+  .hero-img{
+    position:absolute;inset:0;
+    width:100%;height:100%;
     object-fit:cover;
-    z-index:2;
+    z-index:1;
   }
-  .hero-frame{
-    position:absolute;inset:0;z-index:3;pointer-events:none;
-    background:linear-gradient(180deg, rgba(0,0,0,.35) 0%, transparent 22%, transparent 55%, rgba(0,0,0,.6) 100%);
+  .hero-logo{
+    display:block;
+    height:62px;width:auto;
+    margin-bottom:1rem;
+    filter:drop-shadow(0 8px 22px rgba(0,0,0,.45));
   }
-
-  /* LIVE indicator */
-  .live{
-    position:absolute;
-    top:1.15rem;right:1.15rem;
-    z-index:5;
-    display:inline-flex;
-    align-items:center;
-    gap:.5rem;
-    padding:.4rem .75rem .4rem .55rem;
-    background:rgba(0,0,0,.4);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-    border-radius:999px;
-    color:#fff;
-    font-size:.65rem;
-    letter-spacing:.15em;
-    font-weight:700;
-    text-transform:uppercase;
+  .hero-inner{
+    position:relative;z-index:5;
+    width:100%;max-width:660px;margin-inline:auto;
+    padding:calc(1.5rem + env(safe-area-inset-top)) 1.35rem 0;
   }
-  .live-dot{
-    width:7px;height:7px;
-    background:#ff4444;
-    border-radius:50%;
-    animation:pulse 1.8s ease-in-out infinite;
-    flex-shrink:0;
+  .hero-kicker{
+    display:block;
+    font-size:.72rem;font-weight:700;letter-spacing:.14em;
+    color:var(--pink);margin-bottom:.6rem;
   }
-  @keyframes pulse{
-    0%,100%{opacity:.7;box-shadow:0 0 0 0 rgba(255,68,68,.65)}
-    50%{opacity:1;box-shadow:0 0 0 6px rgba(255,68,68,0)}
+  .hero-title{
+    font-family:var(--serif);font-weight:900;
+    font-size:clamp(2.3rem, 10.5vw, 3.5rem);
+    line-height:1.03;letter-spacing:-.025em;
+    color:#fff;margin-bottom:.55rem;
+  }
+  .hero-lead{
+    font-size:.96rem;color:rgba(255,255,255,.7);
+    max-width:32ch;margin-bottom:1.5rem;
   }
 
-  /* Floating event teaser */
-  .teaser-wrap{
-    position:relative;
-    max-width:520px;
-    margin:-3rem auto 0;
-    padding:0 1.25rem;
-    z-index:10;
+  /* Date list — the hero's real content */
+  .datelist{border-block-start:1px solid var(--line-light)}
+  .daterow{
+    display:flex;align-items:center;gap:.9rem;
+    padding:.8rem .2rem;
+    border-block-end:1px solid var(--line-light);
+    transition:padding-inline-start .2s ease, background .2s ease;
   }
-  .teaser{
-    display:flex;align-items:center;gap:.95rem;
-    background:#fff;
-    border-radius:18px;
-    padding:.9rem 1.05rem;
-    box-shadow:var(--shadow-xl);
-    transition:transform .25s ease, box-shadow .25s ease;
-  }
-  .teaser:hover{
-    transform:translateY(-3px);
-    box-shadow:0 40px 90px rgba(20,20,20,.28);
-  }
-  .teaser-date{
+  .daterow:hover{padding-inline-start:.5rem;background:rgba(255,255,255,.05)}
+  .daterow-date{
     flex:0 0 auto;
-    text-align:center;
-    background:var(--pink-soft);
-    padding:.65rem .85rem;
-    border-radius:12px;
-    min-width:62px;
+    font-family:var(--serif);font-weight:900;
+    font-size:1.45rem;line-height:1;color:#fff;
+    min-width:4.6ch;direction:ltr;text-align:start;
+    letter-spacing:-.02em;
   }
-  .teaser-date-day{
+  .daterow-body{flex:1;min-width:0}
+  .daterow-name{
     display:block;
-    font-family:var(--serif);
-    font-weight:900;
-    font-size:1.55rem;
-    color:var(--pink);
-    line-height:1;
-  }
-  .teaser-date-mon{
-    display:block;
-    font-size:.6rem;
-    letter-spacing:.2em;
-    color:var(--pink);
-    text-transform:uppercase;
-    margin-top:.2rem;
-    font-weight:700;
-  }
-  .teaser-info{flex:1;min-width:0}
-  .teaser-label{
-    font-size:.58rem;letter-spacing:.3em;
-    color:var(--muted);text-transform:uppercase;
-    margin-bottom:.15rem;font-weight:700;
-  }
-  .teaser-title{
-    font-family:var(--serif);font-weight:700;
-    font-size:1rem;line-height:1.2;color:var(--ink);
+    font-size:.93rem;font-weight:700;color:#fff;line-height:1.3;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-  .teaser-cta{
-    flex:0 0 auto;
-    display:flex;align-items:center;justify-content:center;
-    width:40px;height:40px;
-    background:var(--pink);color:#fff;
-    border-radius:50%;
-    font-size:1.15rem;font-weight:900;font-family:var(--serif);
-    box-shadow:0 6px 16px rgba(229,72,159,.35);
-    transition:transform .25s ease, background .25s ease;
-  }
-  .teaser:hover .teaser-cta{transform:translateX(-3px);background:var(--pink-dark)}
-
-  /* ---- Hills separator ---- */
-  .hills-sep{
+  .daterow-meta{
     display:block;
-    width:100%;
-    height:32px;
+    font-size:.71rem;color:rgba(255,255,255,.5);
+    letter-spacing:.03em;line-height:1.35;
+  }
+  .daterow-arrow{
+    flex:0 0 auto;
+    font-family:var(--serif);font-weight:900;font-size:1.05rem;
     color:var(--pink);
-    opacity:.4;
-    margin:0;
+    transition:transform .25s ease;
   }
-  .hills-sep.light{color:rgba(255,255,255,.5)}
+  .daterow:hover .daterow-arrow{transform:translateX(-4px)}
 
-  /* ---- Events section (cream) ---- */
-  .events{
-    background:var(--cream);
-    padding:4rem 1.25rem 3rem;
+  /* ==================== Hills ==================== */
+  .hills-sep{
+    display:block;width:100%;height:26px;
+    color:var(--ink);opacity:.15;background:var(--cream);
   }
-  .events-inner{max-width:600px;margin:0 auto}
-  .section-head{
-    text-align:center;
-    margin-bottom:2.75rem;
-  }
-  .eyebrow{
-    display:inline-flex;align-items:center;gap:.75rem;
-    font-size:.65rem;letter-spacing:.4em;
-    color:var(--muted);font-weight:700;
-    margin-bottom:1rem;text-transform:uppercase;
-  }
-  .eyebrow::before, .eyebrow::after{
-    content:'';display:block;width:22px;height:1px;
-    background:currentColor;opacity:.5;
-  }
-  .section-title{
+
+  /* ==================== EVENTS ==================== */
+  .events{background:var(--cream);padding:3.25rem 1.35rem 3.5rem}
+  .events-inner{max-width:660px;margin-inline:auto}
+  .head{display:flex;align-items:baseline;gap:.9rem;margin-bottom:1.9rem}
+  .head::after{content:'';flex:1;height:1px;background:var(--line)}
+  .head-title{
     font-family:var(--serif);font-weight:900;
-    font-size:clamp(2.5rem, 10vw, 4rem);
+    font-size:clamp(1.6rem, 6vw, 2.1rem);
     line-height:1;letter-spacing:-.02em;
-    color:var(--ink);
   }
 
-  /* Event card */
-  .event{
-    background:#fff;border-radius:20px;overflow:hidden;
-    box-shadow:var(--shadow-md);
-    transition:transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease;
-    position:relative;
-  }
-  .event-graphic{
-    width:100%;aspect-ratio:1/1;object-fit:cover;display:block;
-  }
-  .event-body{padding:1.4rem 1.4rem 1.6rem}
-  .event-loc{
-    display:inline-flex;align-items:center;gap:.35rem;
-    font-size:.72rem;letter-spacing:.08em;
-    color:var(--muted);
-    margin-bottom:.9rem;
-    font-weight:500;
-  }
-  .event-loc svg{
-    width:12px;height:12px;flex-shrink:0;
-    color:var(--pink);
-  }
-  .event-meta{
-    display:flex;justify-content:space-between;align-items:flex-end;
-    margin-bottom:1.15rem;gap:1rem;
-  }
-  .event-price-label{
-    font-size:.65rem;letter-spacing:.18em;
-    color:var(--muted);text-transform:uppercase;
-    margin-bottom:.15rem;
-  }
-  .event-price{
-    font-family:var(--serif);font-weight:900;
-    font-size:1.85rem;line-height:1;color:var(--ink);
-  }
-  .event-tag{
-    display:inline-block;background:transparent;
-    color:var(--ink);padding:.4rem 0;
-    font-size:.72rem;
-    font-weight:700;letter-spacing:.1em;white-space:nowrap;
-    text-transform:uppercase;
-  }
-  .event-cta{
-    display:flex;align-items:center;justify-content:center;gap:.5rem;
-    background:var(--pink);color:#fff;
-    padding:1.05rem 1.5rem;border-radius:999px;
-    font-weight:700;font-size:1rem;letter-spacing:.02em;
-    transition:background .2s ease, transform .2s ease;
-  }
-  .event-cta:hover, .event-cta:focus-visible{background:var(--pink-dark)}
-  .event-cta:active{transform:scale(.98)}
-  .event-cta .arrow{
-    transition:transform .3s ease;
-    font-family:var(--serif);font-weight:900;font-size:1.1rem;
-  }
-  .event-cta:hover .arrow{transform:translateX(-4px)}
-
-  .event-ghost{
-    background:transparent;border:1.5px dashed rgba(20,20,20,.12);
-    border-radius:20px;padding:2.5rem 1.5rem;
-    text-align:center;
-    display:flex;flex-direction:column;justify-content:center;
-    min-height:420px;
-  }
-  .event-ghost-eyebrow{
-    font-size:.6rem;letter-spacing:.4em;
-    color:var(--muted);text-transform:uppercase;
-    margin-bottom:.4rem;opacity:.6;
-  }
-  .event-ghost-title{
-    font-family:var(--serif);font-weight:700;
-    font-size:1.05rem;color:var(--ink-soft);opacity:.6;
-  }
-
-  /* ---- Carousel ---- */
-  .carousel{position:relative}
-  .carousel-track{
-    display:flex;
-    gap:.85rem;
+  .carousel{
+    margin-inline:-1.35rem;
+    padding-inline:1.35rem;
+    display:flex;gap:.85rem;
     overflow-x:auto;
     scroll-snap-type:x mandatory;
-    padding:.75rem 1.25rem 1.5rem;
-    margin:-.75rem -1.25rem 0;
     scrollbar-width:none;
     -webkit-overflow-scrolling:touch;
+    padding-block:.4rem 1rem;
   }
-  .carousel-track::-webkit-scrollbar{display:none}
-  .slide{
-    flex:0 0 88%;
+  .carousel::-webkit-scrollbar{display:none}
+
+  .card{
+    flex:0 0 63%;
     scroll-snap-align:center;
     scroll-snap-stop:always;
-    transition:transform .45s cubic-bezier(.2,.7,.2,1), opacity .45s ease, filter .45s ease;
-    transform:scale(.94);
-    opacity:.5;
-    filter:saturate(.85);
+    scroll-margin-inline:1.35rem;
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:var(--shadow-md);
+    display:flex;flex-direction:column;
   }
-  .slide.is-active{
-    transform:scale(1);
-    opacity:1;
-    filter:saturate(1);
+  .card-poster{width:100%;aspect-ratio:1/1;object-fit:contain;background:#e8e2d7}
+  .card-body{padding:.85rem .85rem 1rem;display:flex;flex-direction:column;flex:1}
+
+  .card-when{
+    display:block;
+    font-size:.7rem;font-weight:700;letter-spacing:.04em;
+    color:var(--pink);margin-bottom:.1rem;
   }
-  .dots{
-    display:flex;
-    justify-content:center;
-    gap:.4rem;
-    margin-top:.75rem;
-    padding:0;
+  .card-where{
+    font-size:.75rem;color:var(--muted);
+    margin-bottom:.7rem;line-height:1.4;
   }
+  .price-row{
+    display:flex;align-items:flex-end;justify-content:space-between;
+    gap:.5rem;margin-bottom:.7rem;margin-top:auto;
+    padding-block-start:.65rem;border-block-start:1px solid var(--line);
+  }
+  .price-label{font-size:.66rem;letter-spacing:.14em;color:var(--muted);margin-bottom:.1rem}
+  .price{font-family:var(--serif);font-weight:900;font-size:1.35rem;line-height:1;direction:ltr}
+  .price-hint{font-size:.65rem;color:var(--muted);text-align:end;max-width:11ch;line-height:1.3}
+
+  .cta{
+    display:flex;align-items:center;justify-content:center;gap:.5rem;
+    width:100%;
+    background:var(--pink);color:#fff;
+    padding:.75rem .9rem;border-radius:999px;
+    font-weight:700;font-size:.86rem;
+    transition:background .2s ease, transform .15s ease, box-shadow .2s ease;
+  }
+  .cta:hover{background:var(--pink-dark);box-shadow:0 12px 30px rgba(229,72,159,.3)}
+  .cta:active{transform:scale(.985)}
+  .cta .arrow{font-family:var(--serif);font-weight:900;transition:transform .25s ease}
+  .cta:hover .arrow{transform:translateX(-4px)}
+
+  .dots{display:flex;justify-content:center;gap:.45rem;margin-top:.25rem}
   .dot{
-    width:6px;height:6px;
-    border-radius:50%;
-    border:none;
+    width:6px;height:6px;border-radius:50%;border:0;padding:0;cursor:pointer;
     background:rgba(20,20,20,.18);
-    cursor:pointer;
-    padding:0;
     transition:background .3s ease, transform .3s ease;
   }
-  .dot.active{
-    background:var(--pink);
-    transform:scale(1.5);
-  }
+  .dot.active{background:var(--pink);transform:scale(1.45)}
 
-  /* ---- Community section (dark warm) ---- */
+  /* ==================== COMMUNITY ==================== */
   .community{
-    position:relative;
-    padding:5rem 1.5rem 4.5rem;
-    background:var(--wine-warm);
-    color:#fff;
-    text-align:center;
-    overflow:hidden;
+    position:relative;padding:4.25rem 1.5rem 3.75rem;
+    background:var(--wine-warm);color:#fff;text-align:center;overflow:hidden;
   }
   .community-watermark{
-    position:absolute;
-    bottom:-40px;
-    left:50%;
-    transform:translateX(-50%);
-    width:150%;
-    max-width:800px;
-    opacity:.06;
-    pointer-events:none;
-    color:#fff;
+    position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);
+    width:150%;max-width:820px;opacity:.06;pointer-events:none;color:#fff;
   }
-  .community-inner{
-    position:relative;
-    z-index:2;
-    max-width:440px;
-    margin:0 auto;
-  }
-  .community-eyebrow{
-    font-size:.65rem;letter-spacing:.4em;
-    color:var(--pink);font-weight:700;
-    margin-bottom:.85rem;text-transform:uppercase;
-  }
+  .community-inner{position:relative;z-index:2;max-width:420px;margin-inline:auto}
   .community-title{
     font-family:var(--serif);font-weight:900;
-    font-size:clamp(2rem, 7vw, 2.75rem);
-    line-height:1.1;margin-bottom:.55rem;
-    color:#fff;
-    letter-spacing:-.01em;
+    font-size:clamp(1.9rem, 7vw, 2.5rem);
+    line-height:1.12;margin-bottom:.5rem;letter-spacing:-.01em;
   }
-  .community-sub{
-    color:rgba(255,255,255,.7);
-    font-size:.92rem;
-    margin-bottom:1.25rem;
-    line-height:1.6;
-  }
+  .community-sub{color:rgba(255,255,255,.68);font-size:.92rem;margin-bottom:1.1rem}
   .community-proof{
-    display:inline-flex;
-    align-items:center;
-    gap:.5rem;
-    font-size:.75rem;
-    color:rgba(255,255,255,.55);
-    margin-bottom:2rem;
-    letter-spacing:.05em;
+    display:inline-flex;align-items:center;gap:.5rem;
+    font-size:.75rem;color:rgba(255,255,255,.55);
+    margin-bottom:1.8rem;letter-spacing:.05em;
   }
-  .community-proof strong{
-    color:#fff;
-    font-weight:700;
-  }
+  .community-proof strong{color:#fff;font-weight:700}
   .community-proof-dot{
-    width:5px;height:5px;
-    background:#4dc26e;
-    border-radius:50%;
+    width:5px;height:5px;background:#4dc26e;border-radius:50%;
     box-shadow:0 0 0 3px rgba(77,194,110,.2);
   }
-  .community-buttons{
-    display:flex;flex-direction:column;gap:.7rem;
-  }
+  .community-buttons{display:flex;flex-direction:column;gap:.7rem}
   .community-btn{
     display:flex;align-items:center;justify-content:center;gap:.7rem;
     padding:1rem 1.5rem;border-radius:999px;
-    font-weight:700;font-size:.95rem;letter-spacing:.02em;
+    font-weight:700;font-size:.95rem;
     transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
   }
   .community-btn:hover{transform:translateY(-2px)}
-  .btn-wa{
-    background:#25D366;color:#fff;
-    box-shadow:0 8px 24px rgba(37,211,102,.35);
-  }
-  .btn-wa:hover{box-shadow:0 14px 32px rgba(37,211,102,.45)}
-  .btn-ig{
-    background:transparent;color:#fff;
-    border:1.5px solid rgba(255,255,255,.35);
-  }
+  .btn-wa{background:#25D366;color:#fff;box-shadow:0 8px 24px rgba(37,211,102,.3)}
+  .btn-wa:hover{box-shadow:0 14px 32px rgba(37,211,102,.42)}
+  .btn-ig{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.32)}
   .btn-ig:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5)}
   .btn-icon{width:20px;height:20px;flex-shrink:0}
 
-  /* ---- Footer ---- */
+  /* ==================== FOOTER ==================== */
   footer{
-    background:var(--wine-warm);
-    color:rgba(255,255,255,.55);
-    text-align:center;
-    padding:2rem 1.25rem 2.5rem;
-    position:relative;
+    background:var(--wine-warm);color:rgba(255,255,255,.5);
+    text-align:center;padding:1.7rem 1.25rem 2.2rem;
   }
   .footer-sign{
-    font-family:var(--serif);
-    font-size:.95rem;
-    color:rgba(255,255,255,.75);
-    margin-bottom:.75rem;
+    font-family:var(--serif);font-size:.95rem;
+    color:rgba(255,255,255,.72);margin-bottom:.6rem;
   }
-  .footer-sign a{
-    color:var(--pink);
-    font-weight:500;
-    transition:color .2s ease;
-  }
+  .footer-sign a{font-weight:500;transition:color .2s ease}
   .footer-sign a:hover{color:#fff}
-  .footer-meta{
-    font-size:.6rem;letter-spacing:.3em;
-    text-transform:uppercase;
-    opacity:.5;
-  }
+  .footer-meta{font-size:.6rem;letter-spacing:.3em;opacity:.45}
 
+  /* ==================== Desktop ==================== */
   @media (min-width:900px){
-    .hero{
-      aspect-ratio:16/6;max-height:60vh;
-      max-width:1400px;border-radius:0 0 32px 32px;
+    .hero{min-height:90svh}
+    .hero-inner{max-width:1080px;padding-top:2.5rem}
+    .hero-title{font-size:3.8rem}
+    .hero-lead{max-width:40ch}
+    .datelist{display:grid;grid-template-columns:repeat(3,1fr);gap:0 1.5rem;border-block-start:none}
+    .daterow{border-block-start:1px solid var(--line-light)}
+    .daterow-date{font-size:1.65rem}
+    .events-inner{max-width:1180px}
+    .carousel{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;max-width:900px;margin-inline:auto;
+      overflow:visible;margin-inline:0;padding-inline:0;
     }
-    .hero video{object-position:center 30%}
-    .events-inner{max-width:1200px}
-    .events{padding:5rem 2rem 4rem}
-    .carousel-track{
-      display:grid;grid-template-columns:repeat(3, 1fr);gap:1.5rem;
-      overflow:visible;padding:0;margin:0;
-    }
-    .slide{
-      flex:none;scroll-snap-align:none;
-      transform:none;opacity:1;filter:none;
-    }
+    .card{flex:none;scroll-snap-align:none}
     .dots{display:none}
   }
 
-  @media (prefers-reduced-motion: reduce){
+  @media (prefers-reduced-motion:reduce){
     *{animation:none !important;transition:none !important}
-    .hero video{display:none}
+    html{scroll-behavior:auto}
   }
 </style>
 </head>
 <body>
 
-<header>
-  <img src="logo-3d.webp" alt="BAGALIL" class="logo3d">
-</header>
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+  <picture>
+    <source srcset="hero-wide.webp" media="(min-width: 900px)">
+    <img class="hero-img" src="hero.webp" alt="" width="1080" height="1920"
+         fetchpriority="high" decoding="async">
+  </picture>
 
-<div class="hero-wrap">
-  <div class="hero">
-    <video autoplay muted loop playsinline preload="auto">
-      <source src="party.mp4" type="video/mp4">
-    </video>
-    <div class="hero-frame"></div>
-    <div class="live">
-      <span class="live-dot" aria-hidden="true"></span>
-      <span>אווירה · מהאירוע האחרון</span>
-    </div>
+  <div class="hero-inner">
+    <!-- COPY: כל הטקסט כאן לאישור / כתיבה מחדש שלך -->
+    <img src="logo-3d.webp" alt="BAGALIL" class="hero-logo" width="186" height="62">
+    <span class="hero-kicker">אוגוסט 2026 · צפון</span>
+    <h1 class="hero-title">שלושה פסטיבלי יין.<br>בחרו תאריך.</h1>
+    <p class="hero-lead">יין חופשי, מוזיקה ונוף. שלושה יקבים, חודש אחד.</p>
+
+    <nav class="datelist" aria-label="האירועים הקרובים">
+      <a class="daterow" href="#ev-recanati">
+        <span class="daterow-date">14.08</span>
+        <span class="daterow-body">
+          <span class="daterow-name">פסטיבל היין · יקב רקנאטי</span>
+          <span class="daterow-meta">שישי · 12:00 · מתחם ממוזג</span>
+        </span>
+        <span class="daterow-arrow" aria-hidden="true">←</span>
+      </a>
+      <a class="daterow" href="#ev-redwhite">
+        <span class="daterow-date">15.08</span>
+        <span class="daterow-body">
+          <span class="daterow-name">RED &amp; WHITE · רמת ישי</span>
+          <span class="daterow-meta">שבת · 17:30 · שקיעה תחת כיפת השמיים</span>
+        </span>
+        <span class="daterow-arrow" aria-hidden="true">←</span>
+      </a>
+      <a class="daterow" href="#ev-odem">
+        <span class="daterow-date">28.08</span>
+        <span class="daterow-body">
+          <span class="daterow-name">עומרי סמדר · יקב הר אודם</span>
+          <span class="daterow-meta">שישי · 12:00 · רמת הגולן</span>
+        </span>
+        <span class="daterow-arrow" aria-hidden="true">←</span>
+      </a>
+    </nav>
   </div>
+</section>
 
-  <div class="teaser-wrap">
-    <a href="#events" class="teaser" data-event="teaser-recanati">
-      <div class="teaser-date">
-        <span class="teaser-date-day">14</span>
-        <span class="teaser-date-mon">Aug</span>
-      </div>
-      <div class="teaser-info">
-        <div class="teaser-label">האירוע הבא</div>
-        <div class="teaser-title">פסטיבל היין · יקב רקנאטי</div>
-      </div>
-      <span class="teaser-cta" aria-label="עבור לכרטיסים">↓</span>
-    </a>
-  </div>
-</div>
-
-<svg class="hills-sep" viewBox="0 0 400 30" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
-  <path d="M0,17 C50,4 100,26 150,13 S250,22 300,8 S400,17 400,17" stroke="currentColor" fill="none" stroke-width="1.5" opacity=".55"/>
-  <path d="M0,23 C60,10 120,30 180,17 S280,26 340,12 S400,22 400,22" stroke="currentColor" fill="none" stroke-width="1" opacity=".35"/>
+<svg class="hills-sep" viewBox="0 0 400 26" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0,15 C50,4 100,23 150,11 S250,20 300,6 S400,15 400,15" stroke="currentColor" fill="none" stroke-width="1.5"/>
+  <path d="M0,21 C60,9 120,27 180,15 S280,24 340,10 S400,20 400,20" stroke="currentColor" fill="none" stroke-width="1" opacity=".6"/>
 </svg>
 
+<!-- ==================== EVENTS ==================== -->
 <section class="events" id="events">
   <div class="events-inner">
-    <div class="section-head">
-      <div class="eyebrow">Upcoming</div>
-      <h1 class="section-title">האירועים<br>הקרובים</h1>
-    </div>
+    <div class="head"><h2 class="head-title">האירועים</h2></div>
 
-    <div class="carousel">
-      <div class="carousel-track">
-        <article class="event slide is-active">
-          <img class="event-graphic" src="recanati.webp" alt="פסטיבל היין של יקב רקנאטי · 14.08" loading="eager">
-          <div class="event-body">
-            <div class="event-loc">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s-8-7.58-8-13a8 8 0 1116 0c0 5.42-8 13-8 13z"/>
-                <circle cx="12" cy="9" r="2.5"/>
-              </svg>
-              <span>גליל · יקב רקנאטי</span>
+    <div class="carousel" id="carousel">
+      <article class="card" id="ev-recanati">
+        <img class="card-poster" src="recanati.webp" alt="פסטיבל היין ביקב רקנאטי · שישי 14.08 בשעה 12:00"
+             width="1080" height="1080" loading="eager" decoding="async" fetchpriority="high">
+        <div class="card-body">
+          <span class="card-when">שישי · 14.08 · 12:00–16:30</span>
+          <div class="card-where">יקב רקנאטי · מתחם ממוזג</div>
+          <div class="price-row">
+            <div>
+              <div class="price-label">החל מ־</div>
+              <div class="price">₪155</div>
             </div>
-            <div class="event-meta">
-              <div>
-                <div class="event-price-label">כרטיסים החל מ־</div>
-                <div class="event-price">₪155</div>
-              </div>
-              <span class="event-tag">שישי · 14.08</span>
-            </div>
-            <a href="#" class="event-cta" data-event="recanati-aug-14">
-              <span>לרכישת כרטיסים</span>
-              <span class="arrow">←</span>
-            </a>
+            <div class="price-hint">כוס + יין חופשי</div>
           </div>
-        </article>
-
-        <div class="event-ghost slide">
-          <div class="event-ghost-eyebrow">בקרוב</div>
-          <div class="event-ghost-title">אירוע נוסף</div>
+          <a href="#" class="cta" data-ticket="recanati" data-event="recanati-14-08">
+            <span>לכרטיסים</span><span class="arrow" aria-hidden="true">←</span>
+          </a>
         </div>
-
-        <div class="event-ghost slide">
-          <div class="event-ghost-eyebrow">בקרוב</div>
-          <div class="event-ghost-title">אירוע נוסף</div>
+      </article>
+      <article class="card" id="ev-redwhite">
+        <img class="card-poster" src="redwhite.webp" alt="RED &amp; WHITE · שבת 15.08, פתיחת שערים 17:30"
+             width="1080" height="1080" loading="lazy" decoding="async">
+        <div class="card-body">
+          <span class="card-when">שבת · 15.08 · שערים 17:30</span>
+          <div class="card-where">חורש האלונים, רמת ישי · תחת כיפת השמיים</div>
+          <div class="price-row">
+            <div>
+              <div class="price-label">החל מ־</div>
+              <div class="price">₪170</div>
+            </div>
+            <div class="price-hint">6 יינות מ־4 יקבים</div>
+          </div>
+          <a href="#" class="cta" data-ticket="redwhite" data-event="redwhite-15-08">
+            <span>לכרטיסים</span><span class="arrow" aria-hidden="true">←</span>
+          </a>
         </div>
-      </div>
-      <div class="dots" aria-label="ניווט אירועים">
-        <button class="dot active" data-slide="0" aria-label="אירוע 1"></button>
-        <button class="dot" data-slide="1" aria-label="אירוע 2"></button>
-        <button class="dot" data-slide="2" aria-label="אירוע 3"></button>
-      </div>
+      </article>
+      <article class="card" id="ev-odem">
+        <img class="card-poster" src="odem.webp" alt="עומרי סמדר ביקב הר אודם · שישי 28.08 בשעה 12:00"
+             width="1080" height="1080" loading="lazy" decoding="async">
+        <div class="card-body">
+          <span class="card-when">שישי · 28.08 · 12:00–17:00</span>
+          <div class="card-where">יקב הר אודם, רמת הגולן · רחבה מוצלת</div>
+          <div class="price-row">
+            <div>
+              <div class="price-label">החל מ־</div>
+              <div class="price">₪171</div>
+            </div>
+            <div class="price-hint">Omri Smadar · Gadof · Adip</div>
+          </div>
+          <a href="#" class="cta" data-ticket="odem" data-event="odem-28-08">
+            <span>לכרטיסים</span><span class="arrow" aria-hidden="true">←</span>
+          </a>
+        </div>
+      </article>
+    </div>
+    <div class="dots" aria-label="ניווט אירועים">
+      <button class="dot active" data-slide="0" aria-label="אירוע 1"></button>
+      <button class="dot" data-slide="1" aria-label="אירוע 2"></button>
+      <button class="dot" data-slide="2" aria-label="אירוע 3"></button>
+    </div>
     </div>
   </div>
 </section>
 
+<!-- ==================== COMMUNITY ==================== -->
 <section class="community">
   <svg class="community-watermark" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
     <path d="M0,120 C60,80 120,140 180,110 S280,130 340,95 S400,115 400,115 L400,200 L0,200 Z" fill="currentColor"/>
@@ -584,9 +423,8 @@
   </svg>
 
   <div class="community-inner">
-    <div class="community-eyebrow">Community</div>
     <h2 class="community-title">לא לפספס אירוע</h2>
-    <p class="community-sub">הצטרפו לקהילה — מידע ראשוני, הצצות מאחורי הקלעים,<br>וכרטיסים במחיר מוקדם</p>
+    <p class="community-sub">מידע ראשוני, הצצות מאחורי הקלעים וכרטיסים במחיר מוקדם</p>
 
     <div class="community-proof">
       <span class="community-proof-dot" aria-hidden="true"></span>
@@ -594,18 +432,12 @@
     </div>
 
     <div class="community-buttons">
-      <a href="https://chat.whatsapp.com/JPlYEQ2D0dxEZKJDwsSC8v?s=cl&p=i&mlu=0"
-         class="community-btn btn-wa" target="_blank" rel="noopener">
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/>
-        </svg>
+      <a href="https://chat.whatsapp.com/JPlYEQ2D0dxEZKJDwsSC8v?s=cl&p=i&mlu=0" class="community-btn btn-wa" target="_blank" rel="noopener">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/></svg>
         הצטרפו לקהילת WhatsApp
       </a>
-      <a href="https://www.instagram.com/bagalil2025?igsh=Y3pkOHZ5OWhuMDVy&utm_source=qr"
-         class="community-btn btn-ig" target="_blank" rel="noopener">
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-        </svg>
+      <a href="https://www.instagram.com/bagalil2025?igsh=Y3pkOHZ5OWhuMDVy&utm_source=qr" class="community-btn btn-ig" target="_blank" rel="noopener">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
         עקבו באינסטגרם · 2,000+
       </a>
     </div>
@@ -620,47 +452,66 @@
 </footer>
 
 <script>
+  /* =========================================================
+     ↓↓↓ הדבק כאן את שלושת לינקי הזיגו. זה המקום היחיד לערוך.
+     ========================================================= */
+  const TICKETS = {
+    recanati : '#',
+    redwhite : '#',
+    odem     : '#'
+  };
+
+  document.querySelectorAll('[data-ticket]').forEach(a=>{
+    const url = TICKETS[a.dataset.ticket];
+    if(url && url !== '#'){ a.href = url; a.target = '_blank'; a.rel = 'noopener'; }
+  });
+
   function track(evt, data){
     try{
       if(typeof gtag==='function') gtag('event', evt, data||{});
       if(typeof fbq==='function') fbq('trackCustom', evt, data||{});
       if(window.dataLayer) window.dataLayer.push(Object.assign({event:evt}, data||{}));
     }catch(e){}
-    console.log('[BAGLIL]', evt, data||'');
   }
   document.querySelectorAll('[data-event]').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      track('ticket_click', {event: el.dataset.event});
+    el.addEventListener('click', ()=> track('ticket_click', {event: el.dataset.event}));
+  });
+  const carousel = document.getElementById('carousel');
+  const slides = carousel ? [...carousel.querySelectorAll('.card')] : [];
+  const dots   = [...document.querySelectorAll('.dot')];
+
+  function goTo(i){
+    slides[i]?.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  }
+  dots.forEach((d,i)=> d.addEventListener('click', ()=> goTo(i)));
+
+  document.querySelectorAll('.daterow').forEach(el=>{
+    el.addEventListener('click', e=>{
+      const id = el.getAttribute('href').slice(1);
+      const i  = slides.findIndex(s=>s.id===id);
+      track('date_select', {target:id});
+      if(i>=0){
+        e.preventDefault();
+        document.getElementById('events').scrollIntoView({behavior:'smooth', block:'start'});
+        setTimeout(()=>goTo(i), 420);
+      }
     });
   });
-  document.querySelector('.btn-wa')?.addEventListener('click',
-    ()=>track('community_click', {channel:'whatsapp'}));
-  document.querySelector('.btn-ig')?.addEventListener('click',
-    ()=>track('community_click', {channel:'instagram'}));
 
-  // Carousel: dots ↔ scroll sync, dim non-active slides
-  const track_el = document.querySelector('.carousel-track');
-  const dots = document.querySelectorAll('.dot');
-  if (track_el && dots.length) {
-    const slides = [...track_el.querySelectorAll('.slide')];
-    dots.forEach((dot, i) => {
-      dot.addEventListener('click', () => {
-        slides[i]?.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
-      });
-    });
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
-          const idx = slides.indexOf(entry.target);
-          if (idx >= 0){
-            slides.forEach((s, i) => s.classList.toggle('is-active', i === idx));
-            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
-          }
+  if(carousel && slides.length){
+    const io = new IntersectionObserver(entries=>{
+      entries.forEach(en=>{
+        if(en.isIntersecting && en.intersectionRatio > .6){
+          const i = slides.indexOf(en.target);
+          if(i>=0) dots.forEach((d,j)=> d.classList.toggle('active', j===i));
         }
       });
-    }, { root: track_el, threshold: [0.6, 0.85] });
-    slides.forEach(slide => observer.observe(slide));
+    }, {root:carousel, threshold:[.6,.9]});
+    slides.forEach(sl => io.observe(sl));
   }
+  document.querySelector('.btn-wa')?.addEventListener('click', ()=>track('community_click',{channel:'whatsapp'}));
+  document.querySelector('.btn-ig')?.addEventListener('click', ()=>track('community_click',{channel:'instagram'}));
+
 </script>
 
 </body>
